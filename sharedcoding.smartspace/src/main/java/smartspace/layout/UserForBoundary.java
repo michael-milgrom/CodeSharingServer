@@ -3,16 +3,14 @@ package smartspace.layout;
 public class UserForBoundary {
 
 	private String email;
-	private String smartspace;
 	
 	public UserForBoundary() {
 		super();
 	}
 
-	public UserForBoundary(String email, String smartspace) {
+	public UserForBoundary(String email) {
 		super();
 		this.email = email;
-		this.smartspace = smartspace;
 	}
 
 	public String getEmail() {
@@ -23,11 +21,4 @@ public class UserForBoundary {
 		this.email = email;
 	}
 
-	public String getSmartspace() {
-		return smartspace;
-	}
-
-	public void setSmartspace(String smartspace) {
-		this.smartspace = smartspace;
-	}
 }

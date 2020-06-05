@@ -106,14 +106,17 @@ public class ActionEntity implements SmartspaceEntity<String> {
 	@Override
 	@Id
 	public String getKey() {
-		return this.actionId;
+		return this.user + "-" + this.actionId;
 	}
 
 	@Override
 	public void setKey(String key) {	
 		if(key != null || key != "") {
-			this.key = key;
-			this.actionId = key;
+			String[] split = key.split("-");
+			if(split!=null & split.length==2) {
+				this.user = split[0];
+				this.actionId = split[1];	
+			}
 		}
 		
 	}

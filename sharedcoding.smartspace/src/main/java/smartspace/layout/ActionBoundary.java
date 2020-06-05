@@ -4,10 +4,11 @@ import java.util.Date;
 import java.util.Map;
 
 import smartspace.data.ActionEntity;
+import smartspace.data.ActionType;
 
 public class ActionBoundary {
 	private Key actionKey;
-	private String type;
+	private ActionType type;
 	private Date created;
 	private Key element;
 	private UserForBoundary player;
@@ -20,7 +21,7 @@ public class ActionBoundary {
 	}
 
 
-	public ActionBoundary(String type, Key element, UserForBoundary player, Map<String, Object> properties) {
+	public ActionBoundary(ActionType type, Key element, UserForBoundary player, Map<String, Object> properties) {
 		super();
 		this.type = type;
 		this.element = element;
@@ -30,8 +31,8 @@ public class ActionBoundary {
 
 	public ActionBoundary(ActionEntity entity){
 		if(entity!=null) {
-			if(entity.getActionId() != null && entity.getActionSmartspace() != null)
-				this.actionKey = new Key(entity.getActionId(), entity.getActionSmartspace());
+			if(entity.getActionId() != null && entity.getUser() != null)
+				this.actionKey = new Key(entity.getUser(), entity.getActionId());
 			else
 				this.actionKey = null;
 		
@@ -39,14 +40,13 @@ public class ActionBoundary {
 		this.created = entity.getCreationTimestamp();
 			
 		this.element = new Key();//??
-		this.element.setId(entity.getElementId());
-		this.element.setSmartspace(entity.getElementSmartspace());
+		this.element.setId(entity.getActionId());
+		this.element.setUser(entity.getUser());
 		
 		this.player= new UserForBoundary();//??
-		this.player.setEmail(entity.getPlayerEmail());
-		this.player.setSmartspace(entity.getPlayerSmartspace());
+		this.player.setEmail(entity.getUser());
 		
-		this.properties = entity.getMoreAttributes();
+		this.properties = entity.getProperties();
 		}
 	}
 	
@@ -54,22 +54,20 @@ public class ActionBoundary {
 		ActionEntity entity = new ActionEntity();
 		
 		if(this.actionKey!= null)
-			entity.setKey(actionKey.getSmartspace() + "=" + actionKey.getId());
+			entity.setKey(actionKey.getUser() + "-" + actionKey.getId());
 		
 		entity.setActionType(this.type);
 		entity.setCreationTimestamp(this.created);
 		
 		if(this.element!=null) {
-		entity.setElementSmartspace(this.element.getSmartspace());
-		entity.setElementId(this.element.getId());
+			entity.setElementKey(this.element.getUser() + "-" + this.element.getId());
 		}
 		
 		if(this.player!=null) {
-			entity.setPlayerEmail(this.player.getEmail());
-			entity.setPlayerSmartspace(this.player.getSmartspace());
+			entity.setUser(this.player.getEmail());
 		}
 		
-		entity.setMoreAttributes(this.properties);
+		entity.setProperties(this.properties);
 		return entity;
 	}
 
@@ -81,11 +79,11 @@ public class ActionBoundary {
 		this.actionKey = actionKey;
 	}
 
-	public String getType() {
+	public ActionType getType() {
 		return type;
 	}
 
-	public void setType(String type) {
+	public void setType(ActionType type) {
 		this.type = type;
 	}
 

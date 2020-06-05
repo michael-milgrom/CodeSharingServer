@@ -1,66 +1,51 @@
 package smartspace.layout;
 
 import smartspace.data.UserEntity;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import smartspace.data.ActionType;
 
 public class UserBoundary {
 	private UserForBoundary key;
-	private String username;
-	private String avatar;
-	private String role;
-	private long points;
+	private String password;
+	private List<String> projects;
 	
 	public UserBoundary() {
 		
 	}
-	
-	public UserBoundary(String username, String avatar, String role, long points) {
-		super();
-		this.username = username;
-		this.avatar = avatar;
-		this.role = role;
-		this.points = points;
-	}
 
+	public UserBoundary(UserForBoundary key, String password, List<String> projects) {
+		super();
+		this.key = key;
+		this.password = password;
+		this.projects = new ArrayList<>(projects);
+	}
 
 
 	public UserBoundary(UserEntity entity) {
 		if(entity!=null) {
-			if(entity.getUserEmail() != null && entity.getUserSmartspace() != null) {
-				this.key = new UserForBoundary(entity.getUserEmail(),  entity.getUserSmartspace());
+			if(entity.getEmail() != null) {
+				this.key = new UserForBoundary(entity.getEmail());
 			}
 			else
 				this.key = null;
 			
-			this.username = entity.getUsername();
-			this.avatar = entity.getAvatar();
-			
-			if(entity.getRole() != null)
-				this.role = entity.getRole().name();
-			else
-				this.role = null;
-			
-			this.points = entity.getPoints();
+			this.password = entity.getPassword();
+			this.projects = new ArrayList<>(entity.getProjects());
 		}
 	}
 	
 	public UserEntity convertToEntity() {
 		UserEntity entity = new UserEntity();
 		
-		entity.setUsername(this.username);
-		entity.setAvatar(this.avatar);
+		entity.setPassword(this.password);
+		entity.setProjects(this.projects);
 		
 		if(this.key!=null) {
-			entity.setUserSmartspace(this.key.getSmartspace());
-			entity.setUserEmail(this.key.getEmail());
+			entity.setEmail(this.key.getEmail());
 		}
-		
-		if(this.role != null)
-			entity.setRole(ActionType.valueOf(this.role));
-		else
-			entity.setRole(null);
-		
-		entity.setPoints(this.points);
 		
 		return entity;
 	}
@@ -73,43 +58,27 @@ public class UserBoundary {
 		this.key = key;
 	}
 
-	public String getUsername() {
-		return username;
+	public String getPassword() {
+		return password;
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
-	public String getAvatar() {
-		return avatar;
+	public List<String> getProjects() {
+		return projects;
 	}
 
-	public void setAvatar(String avatar) {
-		this.avatar = avatar;
-	}
-
-	public String getRole() {
-		return role;
-	}
-
-	public void setRole(String role) {
-		this.role = role;
-	}
-
-	public long getPoints() {
-		return points;
-	}
-
-	public void setPoints(long points) {
-		this.points = points;
+	public void setProjects(List<String> projects) {
+		this.projects = projects;
 	}
 
 	@Override
 	public String toString() {
-		return "UserBoundary [key=" + key + ", username=" + username + ", avatar=" + avatar + ", role=" + role
-				+ ", points=" + points + "]";
+		return "UserBoundary [key=" + key + ", password=" + password + ", projects=" + projects + "]";
 	}
+
 	
 	
 }

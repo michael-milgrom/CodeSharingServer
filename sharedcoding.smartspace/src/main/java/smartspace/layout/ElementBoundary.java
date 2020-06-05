@@ -1,6 +1,8 @@
 package smartspace.layout;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import smartspace.data.ElementEntity;
@@ -9,28 +11,32 @@ import smartspace.data.Line;
 public class ElementBoundary {
 
 	private Key key;
-	private String elementType;
 	private String name;
-	private boolean expired;
-	private Date created;
 	private UserForBoundary creator;
-	private LocationForBoundary latlng;
-	private Map<String, Object> elementProperties;
-
+	private int numberOfLines;
+	private Date lastEditTimestamp;
+	private List<String> users;
+	private List<String> activeUsers;
+	private List<Line> linesOfCode;
+	
+	
 	public ElementBoundary() {
 
 	}
 	
 	
-	public ElementBoundary(String elementType, String name, boolean expired, UserForBoundary creator,
-			LocationForBoundary latlng, Map<String, Object> elementProperties) {
+
+
+	public ElementBoundary(String name, UserForBoundary creator, int numberOfLines, Date lastEditTimestamp,
+			List<String> users, List<String> activeUsers, List<Line> linesOfCode) {
 		super();
-		this.elementType = elementType;
 		this.name = name;
-		this.expired = expired;
 		this.creator = creator;
-		this.latlng = latlng;
-		this.elementProperties = elementProperties;
+		this.numberOfLines = numberOfLines;
+		this.lastEditTimestamp = lastEditTimestamp;
+		this.users = users;
+		this.activeUsers = activeUsers;
+		this.linesOfCode = linesOfCode;
 	}
 
 
@@ -38,121 +44,166 @@ public class ElementBoundary {
 	public ElementBoundary(ElementEntity entity) {
 		if (entity != null) {
 			if (entity.getKey() != null) {
-				String[] args = entity.getKey().split("=");
+				String[] args = entity.getKey().split("-");
 				if (args.length == 2) {
 					this.key = new Key();
-					this.key.setSmartspace(args[0]);
+					this.key.setUser(args[0]);
 					this.key.setId(args[1]);
 				}
 			} else
 				this.key = null;
-			this.elementType = entity.getType();
+			
 			this.name = entity.getName();
-			this.created = entity.getCreationTimestamp();
-			this.expired = entity.isExpired();
+			this.numberOfLines = entity.getNumberOfLines();
+			this.lastEditTimestamp = entity.getLastEditTimestamp();
 			this.creator = new UserForBoundary();
-			this.creator.setEmail(entity.getCreatorEmail());
-			this.creator.setSmartspace(entity.getCreatorSmartspace());
-			if (entity.getLocation() != null) {
-				this.latlng = new LocationForBoundary();
-				this.latlng.setLat(entity.getLocation().getX());
-				this.latlng.setLng(entity.getLocation().getY());
-			} else
-				this.latlng = null;
-			this.elementProperties = entity.getMoreAttributes();
+			this.creator.setEmail(entity.getCreator());
+			this.users = new ArrayList<>(entity.getUsers());
+			this.activeUsers = new ArrayList<>(entity.getActiveUsers());
+			this.linesOfCode = new ArrayList<>(entity.getLinesOfCode());
 		}
 	}
 
 	public ElementEntity convertToEntity() {
 		ElementEntity entity = new ElementEntity();
-		if (this.key != null && this.key.getId() != null && this.key.getSmartspace() != null) {
-			entity.setKey(this.key.getSmartspace() + "=" + this.key.getId());
+		if (this.key != null && this.key.getId() != null) {
+			entity.setKey(this.key.getUser() + "-" + this.key.getId());
 		}
-		entity.setType(this.elementType);
+		entity.setActiveUsers(this.activeUsers);
+		entity.setUsers(this.users);
 		entity.setName(this.name);
-		entity.setExpired(this.expired);
-		entity.setCreationTimestamp(this.created);
+		entity.setNumberOfLines(this.numberOfLines);
+		entity.setLastEditTimestamp(this.lastEditTimestamp);
+		entity.setLinesOfCode(this.linesOfCode);
 		if (this.creator != null) {
-			entity.setCreatorEmail(this.creator.getEmail());
-			entity.setCreatorSmartspace(this.creator.getSmartspace());
+			entity.setCreator(this.creator.getEmail());
 		}
-		if (this.latlng != null) {
-			entity.setLocation(new Line(this.latlng.getLat(), this.latlng.getLng()));
-		}
-
-		entity.setMoreAttributes(this.elementProperties);
+		
 		return entity;
 	}
+
+
+
 
 	public Key getKey() {
 		return key;
 	}
 
+
+
+
 	public void setKey(Key key) {
 		this.key = key;
 	}
 
-	public String getElementType() {
-		return elementType;
-	}
 
-	public void setElementType(String elementType) {
-		this.elementType = elementType;
-	}
+
 
 	public String getName() {
 		return name;
 	}
 
+
+
+
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	public boolean isExpired() {
-		return expired;
-	}
 
-	public void setExpired(boolean expired) {
-		this.expired = expired;
-	}
 
-	public Date getCreated() {
-		return created;
-	}
-
-	public void setCreated(Date created) {
-		this.created = created;
-	}
 
 	public UserForBoundary getCreator() {
 		return creator;
 	}
 
+
+
+
 	public void setCreator(UserForBoundary creator) {
 		this.creator = creator;
 	}
 
-	public LocationForBoundary getLatlng() {
-		return latlng;
+
+
+
+	public int getNumberOfLines() {
+		return numberOfLines;
 	}
 
-	public void setLatlng(LocationForBoundary latlng) {
-		this.latlng = latlng;
+
+
+
+	public void setNumberOfLines(int numberOfLines) {
+		this.numberOfLines = numberOfLines;
 	}
 
-	public Map<String, Object> getElementProperties() {
-		return elementProperties;
+
+
+
+	public Date getLastEditTimestamp() {
+		return lastEditTimestamp;
 	}
 
-	public void setElementProperties(Map<String, Object> elementProperties) {
-		this.elementProperties = elementProperties;
+
+
+
+	public void setLastEditTimestamp(Date lastEditTimestamp) {
+		this.lastEditTimestamp = lastEditTimestamp;
 	}
+
+
+
+
+	public List<String> getUsers() {
+		return users;
+	}
+
+
+
+
+	public void setUsers(List<String> users) {
+		this.users = users;
+	}
+
+
+
+
+	public List<String> getActiveUsers() {
+		return activeUsers;
+	}
+
+
+
+
+	public void setActiveUsers(List<String> activeUsers) {
+		this.activeUsers = activeUsers;
+	}
+
+
+
+
+	public List<Line> getLinesOfCode() {
+		return linesOfCode;
+	}
+
+
+
+
+	public void setLinesOfCode(List<Line> linesOfCode) {
+		this.linesOfCode = linesOfCode;
+	}
+
+
+
 
 	@Override
 	public String toString() {
-		return "ElementBoundary [key=" + key + ", elementType=" + elementType + ", name=" + name + ", expired="
-				+ expired + ", created=" + created + ", creator=" + creator + ", latlng=" + latlng
-				+ ", elementProperties=" + elementProperties + "]";
+		return "ElementBoundary [key=" + key + ", name=" + name + ", creator=" + creator + ", numberOfLines="
+				+ numberOfLines + ", lastEditTimestamp=" + lastEditTimestamp + ", users=" + users + ", activeUsers="
+				+ activeUsers + ", linesOfCode=" + linesOfCode + "]";
 	}
+
+	
 
 }

@@ -89,7 +89,7 @@ public class RdbActionDao implements EnhancedActionDao {
 	@Override
 	@Transactional
 	public ActionEntity createWithId(ActionEntity actionEntity, Long id) {
-		actionEntity.setKey(""+id);
+		actionEntity.setKey(actionEntity.getUser() + "-" +id);
 		return this.create(actionEntity);
 	}
 

@@ -7,12 +7,13 @@ public class Line {
 	
 	private int number;
 	private String code;
-	
+	private boolean locked;
 	
 	public Line(int number, String code) {
 		super();
 		this.number = number;
 		this.code = code;
+		this.locked = false;
 	}
 
 
@@ -39,6 +40,16 @@ public class Line {
 	public void setCode(String code) {
 		this.code = code;
 	}
-	
 
+
+	public boolean isLocked() {
+		return locked;
+	}
+
+
+	public void setLocked(boolean locked) {
+		this.locked = locked;
+	}
+	
+	
 }

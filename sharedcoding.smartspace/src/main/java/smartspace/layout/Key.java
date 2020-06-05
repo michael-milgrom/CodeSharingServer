@@ -1,17 +1,17 @@
 package smartspace.layout;
 
 public class Key {
+	private String user;
 	private String id;
-	private String smartspace;
 	
 	public Key() {
 		
 	}
 
-	public Key(String id, String smartspace) {
+	public Key(String user, String id) {
 		super();
+		this.user = user;
 		this.id = id;
-		this.smartspace = smartspace;
 	}
 
 	public String getId() {
@@ -22,11 +22,13 @@ public class Key {
 		this.id = id;
 	}
 
-	public String getSmartspace() {
-		return smartspace;
+	public String getUser() {
+		return user;
 	}
 
-	public void setSmartspace(String smartspace) {
-		this.smartspace = smartspace;
-	}	
+	public void setUser(String user) {
+		this.user = user;
+	}
+
+	
 }

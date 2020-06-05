@@ -39,20 +39,17 @@ public class ElementServiceImpl implements ElementsService {
 
 	@Override
 	@Transactional
-	public List<ElementEntity> newElements(List<ElementEntity> elements, String adminSmartspace, String adminEmail) {
+	public List<ElementEntity> newElements(List<ElementEntity> elements) {
 		List<ElementEntity> elements_entities = new ArrayList<ElementEntity>();
-		if (!valiadete_admin(adminSmartspace, adminEmail)) {
-			throw new RuntimeException("user are not allowed to create elements");
-		}
-
+		
 		for (ElementEntity element : elements) {
 			if (valiadate(element)) {
-				if (!(this.smartspace.equals(element.getElementSmartspace()))) {
+//				if (!(this.smartspace.equals(element.getElementSmartspace()))) {
 
-					this.elementDao.createWithId(element, sequenceDao.newEntity(ElementEntity.getSequenceName()));
+					this.elementDao.createWithId(element);
 					elements_entities.add(element);
-				} else
-					throw new RuntimeException("element smartspace must be different then the local project");
+//				} else
+//					throw new RuntimeException("element smartspace must be different then the local project");
 			} else {
 				throw new RuntimeException("invalid element");
 			}
@@ -61,31 +58,21 @@ public class ElementServiceImpl implements ElementsService {
 		return elements_entities;
 	}
 
-	private boolean valiadete_admin(String adminSmartspace, String adminEmail) {
-		Optional<UserEntity> user = this.userDao.readById(adminSmartspace + "=" + adminEmail);
-		if (user.isPresent() && user.get().getRole().equals(ActionType.ADMIN))
-			return true;
-		return false;
-	}
 
 	private boolean valiadate(ElementEntity entity) {
 		return entity != null 
-				&& entity.getCreatorSmartspace() != null && !entity.getCreatorSmartspace().trim().isEmpty() 
-				&& entity.getCreatorEmail() != null && !entity.getCreatorEmail().trim().isEmpty() 
-				&& entity.getName() != null && !entity.getName().trim().isEmpty()
-				&& entity.getType() != null && !entity.getType().trim().isEmpty()
+				&& entity.getName() != null && !entity.getName().trim().isEmpty() 
+				&& entity.getCreator() != null && !entity.getCreator().trim().isEmpty() 
+				&& entity.getNumberOfLines() >=0 
+				&& entity.getUsers() != null 
 				&& entity.getElementId() != null && !entity.getElementId().trim().isEmpty()
-				&& entity.getElementSmartspace() != null && !entity.getElementSmartspace().trim().isEmpty()
-				&& entity.getLocation() != null
-				&& entity.getMoreAttributes() != null;
+				&& entity.getActiveUsers() != null
+				&& entity.getLinesOfCode() != null
+				&& entity.getLastEditTimestamp() != null;
 	}
 
 	@Override
-	public List<ElementEntity> getElementsUsingPagination(String adminSmartspace, String adminEmail, int size,
-			int page) {
-		if (!(valiadete_admin(adminSmartspace, adminEmail)))
-			throw new RuntimeException("user are not allowed to get elements");
-		else
-			return this.elementDao.readAll("creationTimestamp", size, page);// key?????
+	public List<ElementEntity> getElementsUsingPagination(int size, int page) {
+		return this.elementDao.readAll("creationTimestamp", size, page);// key?????
 	}
 }

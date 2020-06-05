@@ -7,8 +7,8 @@ import smartspace.data.ElementEntity;
 
 public interface ElementsService {
 	
-	public List<ElementEntity> newElements(List<ElementEntity> elements, String adminSmartspace, String adminEmail);
+	public List<ElementEntity> newElements(List<ElementEntity> elements);
 	
-	public List<ElementEntity> getElementsUsingPagination (String adminSmartspace, String adminEmail, int size, int page);
+	public List<ElementEntity> getElementsUsingPagination (int size, int page);
 	
 }
