@@ -41,7 +41,6 @@ public class UserUsersServiceImpl implements UserUsersService{
 	}
 
 	@Override
-	//@CheckRoleOfUser
 	@Transactional
 	public void updateUser(UserEntity user) {
 		

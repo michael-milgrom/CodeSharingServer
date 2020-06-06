@@ -17,6 +17,6 @@ public interface EntityFactory {
 			Date lastEditTimestamp, List<String> users, List<String> activeUsers, List<Line> linesOfCode);
 	
 	public ActionEntity createNewAction(String actionId, String elementKey, String user, 
-			ActionType actionType, Date creationTimestamp, Map<String, Object> properties);
+			String actionType, Date creationTimestamp, Map<String, Object> properties);
 
 }

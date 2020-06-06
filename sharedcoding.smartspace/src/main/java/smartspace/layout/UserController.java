@@ -26,20 +26,18 @@ public class UserController {
 	
 
 	@RequestMapping(
-			path="/smartspace/admin/users/{adminSmartspace}/{adminEmail}",
+			path="/admin/users/{email}",
 			method=RequestMethod.POST,
 			consumes=MediaType.APPLICATION_JSON_VALUE,
 			produces=MediaType.APPLICATION_JSON_VALUE)
 	public UserBoundary[] newElement (
 			@RequestBody UserBoundary[] users, 
-			@PathVariable("adminSmartspace") String adminSmartspace, 
-			@PathVariable("adminEmail") String adminEmail) {
+			@PathVariable("email") String adminEmail) {
 		
 		return this.usersService.newUsers(Arrays.asList(users)
 				.stream()
 				.map(UserBoundary::convertToEntity)
-				.collect(Collectors.toList())
-				,adminSmartspace, adminEmail)
+				.collect(Collectors.toList()))
 				.stream()
 				.map(UserBoundary::new)
 				.collect(Collectors.toList())
@@ -47,17 +45,16 @@ public class UserController {
 	}
 
 	@RequestMapping(
-			path="/smartspace/admin/users/{adminSmartspace}/{adminEmail}",
+			path="/admin/users/{email}",
 			method=RequestMethod.GET,
 			produces=MediaType.APPLICATION_JSON_VALUE)
 	public UserBoundary[] getUsersUsingPagination (
-			@PathVariable("adminSmartspace") String adminSmartspace, 
-			@PathVariable("adminEmail") String adminEmail,
+			@PathVariable("email") String adminEmail,
 			@RequestParam(name="size", required=false, defaultValue="10") int size,
 			@RequestParam(name="page", required=false, defaultValue="0") int page) {
 		return 
 			this.usersService
-			.getUsersUsingPagination(adminSmartspace, adminEmail, size, page)
+			.getUsersUsingPagination(size, page)
 			.stream()
 			.map(UserBoundary::new)
 			.collect(Collectors.toList())

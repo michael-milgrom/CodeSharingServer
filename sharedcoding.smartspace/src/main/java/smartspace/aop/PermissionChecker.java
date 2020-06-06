@@ -36,10 +36,10 @@ public class PermissionChecker {
 		Object[] args = pjp.getArgs();
 		Optional<UserEntity> user = this.userDao.readById(userSmartspace + "=" + userEmail);
 
-		if(user.isPresent())
-			args[2] = user.get().getRole();
-		else
-			throw new RuntimeException("The user isn't exist");
+//		if(user.isPresent())
+//			args[2] = user.get().getRole();
+//		else
+//			throw new RuntimeException("The user isn't exist");
 				
 		logger.debug("********* " + fullyQualifiedClassName + "." + method + "(" + userSmartspace + ","+ userEmail + ","+ role + ",.....)" + role);
 		

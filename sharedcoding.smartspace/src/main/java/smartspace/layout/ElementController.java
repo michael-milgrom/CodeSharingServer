@@ -28,36 +28,33 @@ public class ElementController {
 	
 
 	@RequestMapping(
-			path="/smartspace/admin/elements/{adminSmartspace}/{adminEmail}",
+			path="/admin/elements/{email}",
 			method=RequestMethod.POST,
 			consumes=MediaType.APPLICATION_JSON_VALUE,
 			produces=MediaType.APPLICATION_JSON_VALUE)
 	public List<ElementBoundary> newElement (
 			@RequestBody ElementBoundary[] elements, 
-			@PathVariable("adminSmartspace") String adminSmartspace, 
-			@PathVariable("adminEmail") String adminEmail) {		
+			@PathVariable("email") String adminEmail) {		
 		return this.elementsService.newElements(Arrays.asList(elements)
 				.stream()
 				.map(ElementBoundary::convertToEntity)
-				.collect(Collectors.toList())
-				,adminSmartspace, adminEmail)
+				.collect(Collectors.toList()))
 				.stream()
 				.map(ElementBoundary::new)
 				.collect(Collectors.toList());
 	}
 
 	@RequestMapping(
-			path="/smartspace/admin/elements/{adminSmartspace}/{adminEmail}",
+			path="/admin/elements/{email}",
 			method=RequestMethod.GET,
 			produces=MediaType.APPLICATION_JSON_VALUE)
-	public ElementBoundary[] getElementsUsingPagination (
-			@PathVariable("adminSmartspace") String adminSmartspace, 
-			@PathVariable("adminEmail") String adminEmail,
+	public ElementBoundary[] getElementsUsingPagination ( 
+			@PathVariable("email") String adminEmail,
 			@RequestParam(name="size", required=false, defaultValue="10") int size,
 			@RequestParam(name="page", required=false, defaultValue="0") int page) {
 		return 
 			this.elementsService
-			.getElementsUsingPagination(adminSmartspace, adminEmail, size, page)
+			.getElementsUsingPagination(size, page)
 			.stream()
 			.map(ElementBoundary::new)
 			.collect(Collectors.toList())

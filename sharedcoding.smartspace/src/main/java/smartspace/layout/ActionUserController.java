@@ -23,13 +23,13 @@ public class ActionUserController {
 	
 	
 	@RequestMapping(
-			path="/smartspace/actions",
+			path="/actions",
 			method=RequestMethod.POST,
 			consumes=MediaType.APPLICATION_JSON_VALUE,
 			produces=MediaType.APPLICATION_JSON_VALUE)
 	public Map<String,Object> invokeAnAction(
 			@RequestBody ActionBoundary action) {		
-		return actionService.invokeAction(action.getPlayer().getSmartspace(),action.getPlayer().getEmail(), null,action.convertToEntity());
+		return actionService.invokeAction(action.getPlayer().getEmail(),action.convertToEntity());
 	}
 }
 

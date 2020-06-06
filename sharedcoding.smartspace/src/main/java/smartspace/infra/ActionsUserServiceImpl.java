@@ -52,7 +52,7 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 		} else
 			throw new RuntimeException("The user doesn't exist");
 
-		ActionType type = action.getActionType();
+		String type = action.getActionType();
 		String[] name = action.getUser().split("@");
 //		switch (type) {
 //		case "echo":

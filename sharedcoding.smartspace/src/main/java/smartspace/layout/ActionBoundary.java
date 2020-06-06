@@ -8,7 +8,7 @@ import smartspace.data.ActionType;
 
 public class ActionBoundary {
 	private Key actionKey;
-	private ActionType type;
+	private String type;
 	private Date created;
 	private Key element;
 	private UserForBoundary player;
@@ -21,7 +21,7 @@ public class ActionBoundary {
 	}
 
 
-	public ActionBoundary(ActionType type, Key element, UserForBoundary player, Map<String, Object> properties) {
+	public ActionBoundary(String type, Key element, UserForBoundary player, Map<String, Object> properties) {
 		super();
 		this.type = type;
 		this.element = element;
@@ -79,11 +79,11 @@ public class ActionBoundary {
 		this.actionKey = actionKey;
 	}
 
-	public ActionType getType() {
+	public String getType() {
 		return type;
 	}
 
-	public void setType(ActionType type) {
+	public void setType(String type) {
 		this.type = type;
 	}
 

@@ -9,7 +9,5 @@ public interface UserUsersService {
 	
 	public UserEntity getUser(String userEmail);
 	
-	//public void updateUser(String userSmartspace, String userEmail,ActionType role,UserEntity entity); // TODO WHY DO WE NEED ALL THIS
-	
 	public void updateUser(UserEntity user);
 }

@@ -1,8 +1,10 @@
 package smartspace.infra;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -14,24 +16,27 @@ import smartspace.dao.EnhancedElementDao;
 import smartspace.dao.EnhancedUserDao;
 import smartspace.dao.SequenceDao;
 import smartspace.data.ElementEntity;
+import smartspace.data.UserEntity;
 import smartspace.data.ActionType;
 
 @Service
 public class ElementsUserServiceImpl implements ElementsUserService {
 
 	private EnhancedElementDao<String> elementDao;
+	private EnhancedUserDao<String> userDao;
 	private SequenceDao sequenceDao;
 
 	@Autowired
-	public ElementsUserServiceImpl(EnhancedElementDao<String> elementDao, SequenceDao sequenceDao) {
+	public ElementsUserServiceImpl(EnhancedElementDao<String> elementDao, EnhancedUserDao<String> userDao, SequenceDao sequenceDao) {
 		super();
 		this.elementDao = elementDao;
+		this.userDao = userDao;
 		this.sequenceDao = sequenceDao;
 	}
 
 	@Override
 	@Transactional
-	@CheckRoleOfUser
+	//@CheckRoleOfUser
 	public ElementEntity newElement(ElementEntity element) {
 		if (valiadate(element)) {
 			//TODO do delete//
@@ -47,22 +52,31 @@ public class ElementsUserServiceImpl implements ElementsUserService {
 	@Transactional
 	//@CheckRoleOfUser
 	public void setElement(String elementId,ElementEntity element) {
+		//TODO CHECK THAT THE USER HAS PERMISSION TO EDIT
 		element.setElementId(elementId);
 		this.elementDao.update(element);
 	}
 
 	@Override
 	//@CheckRoleOfUser
-	public ElementEntity getSpecificElement(String elementCreator, String elementName) {
-		
-		return this.elementDao.readById(elementCreator+"-"+elementName)
+	public ElementEntity getSpecificElement(String elementKey) {
+		// TODO CHECK EMAIL
+		return this.elementDao.readById(elementKey)
 				.orElseThrow(() -> new RuntimeException("There is no element with the given key"));
 	}
 
 	@Override
 	//@CheckRoleOfUser
-	public List<ElementEntity> getElementsUsingPagination(int size, int page) {
-		return this.elementDao.readAll(size, page);
+	public List<Optional<ElementEntity>> getElementsUsingPagination(String userEmail, int size, int page) { // TODO PAGINATION
+		UserEntity user = this.userDao.readById(userEmail)
+				.orElseThrow(() -> new RuntimeException("There is no user with the given key"));
+		List<String> projects = user.getProjects();
+		List<Optional<ElementEntity>> elements_entities = new ArrayList<>();
+		for(String elementKey: projects) {
+			elements_entities.add(this.elementDao.readById(elementKey));
+		}
+		return elements_entities;
+		//return this.elementDao.readAll(size, page);
 	}
 
 //	@Override

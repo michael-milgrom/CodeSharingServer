@@ -22,7 +22,7 @@ public class UserUsersController {
 	
 	
 	@RequestMapping(
-			path="/smartspace/users",
+			path="/users",
 			method=RequestMethod.POST,
 			consumes=MediaType.APPLICATION_JSON_VALUE,
 			produces=MediaType.APPLICATION_JSON_VALUE)
@@ -32,25 +32,23 @@ public class UserUsersController {
 			}
 	
 	@RequestMapping(
-			path="/smartspace/users/login/{userSmartspace}/{userEmail}",
+			path="/users/login/{email}",
 			method=RequestMethod.GET,
 			consumes=MediaType.APPLICATION_JSON_VALUE,
 			produces=MediaType.APPLICATION_JSON_VALUE)
 	public UserBoundary getUser (
-			@PathVariable("userSmartspace") String userSmartspace, 
-			@PathVariable("userEmail") String userEmail) {		
-			return new UserBoundary(this.userService.getUser(userSmartspace,userEmail));	
+			@PathVariable("email") String userEmail) {		
+			return new UserBoundary(this.userService.getUser(userEmail));	
 			}
 	
 	@RequestMapping(
-			path="/smartspace/users/login/{userSmartspace}/{userEmail}",
+			path="/users/{email}",
 			method=RequestMethod.PUT,
 			consumes=MediaType.APPLICATION_JSON_VALUE,
 			produces=MediaType.APPLICATION_JSON_VALUE)
 	public void updateUser (
 			@RequestBody UserBoundary user,
-			@PathVariable("userSmartspace") String userSmartspace, 
-			@PathVariable("userEmail") String userEmail) {		
-			this.userService.updateUser(userSmartspace,userEmail,null,user.convertToEntity());	
+			@PathVariable("email") String userEmail) {		
+			this.userService.updateUser(user.convertToEntity());	
 			}
 }

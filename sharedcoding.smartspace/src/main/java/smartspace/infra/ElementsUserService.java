@@ -2,6 +2,7 @@ package smartspace.infra;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import smartspace.data.ElementEntity;
 import smartspace.data.ActionType;
@@ -12,9 +13,9 @@ public interface ElementsUserService {
 	
 	public void setElement(String elementId,ElementEntity element);
 	
-	public ElementEntity getSpecificElement(String elementCreator, String elementName);
+	public ElementEntity getSpecificElement(String elementKey);
 	
-	public List<ElementEntity> getElementsUsingPagination(int size, int page);
+	public List<Optional<ElementEntity>> getElementsUsingPagination(String userEmail,int size, int page);
 	
 //	public List<ElementEntity> getElementsUsingPaginationOfLocation(String userSmartspace, String userEmail, ActionType role,
 //			int x, int y, int distance, int size, int page);

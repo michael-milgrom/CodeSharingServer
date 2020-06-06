@@ -22,7 +22,7 @@ public class ActionEntity implements SmartspaceEntity<String> {
 	private String actionId;
 	private String elementKey;
 	private String user; // email
-	private ActionType actionType;
+	private String actionType;
 	private Date creationTimestamp;
 	private Map<String ,Object> properties;
 	private String key;
@@ -34,13 +34,13 @@ public class ActionEntity implements SmartspaceEntity<String> {
 		this.properties = new HashMap<>();
 	}
 	
-	public ActionEntity(ActionType type) {
+	public ActionEntity(String type) {
 		this();
 		this.actionType = type;
 		//this.properties = new HashMap<>();
 	}
 	
-	public ActionEntity(String actionId, String elementKey, String user, ActionType actionType, Date creationTimestamp,
+	public ActionEntity(String actionId, String elementKey, String user, String actionType, Date creationTimestamp,
 			Map<String, Object> properties) {
 		super();
 		this.actionId = actionId;
@@ -77,11 +77,11 @@ public class ActionEntity implements SmartspaceEntity<String> {
 	}
 
 	@Enumerated(EnumType.STRING)
-	public ActionType getActionType() {
+	public String getActionType() {
 		return this.actionType;
 	}
 
-	public void setActionType(ActionType actionType) {
+	public void setActionType(String actionType) {
 		this.actionType = actionType;
 	}
 
