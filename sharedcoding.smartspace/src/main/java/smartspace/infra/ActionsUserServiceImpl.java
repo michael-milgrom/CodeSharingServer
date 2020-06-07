@@ -1,5 +1,6 @@
 package smartspace.infra;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -53,8 +54,8 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 			throw new RuntimeException("The user doesn't exist");
 
 		String type = action.getActionType();
-		String[] name = action.getUser().split("@");
-//		switch (type) {
+//		String[] name = action.getUser().split("@");
+		switch (type) {
 //		case "echo":
 //			action.setCreationTimestamp(new Date());
 //			try {
@@ -81,28 +82,27 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 //			}
 //			break;
 //
-//		case "check-in":
-//			action.setCreationTimestamp(new Date());
-//			try {
-//				Optional<ElementEntity> element = this.elementDao
-//						.readById(action.getElementSmartspace() + "=" + action.getElementId());
-//				if (element.isPresent()) {
-//					Map<String, Object> drivers = (Map<String, Object>) element.get().getMoreAttributes()
-//							.get("drivers");
-//					if (drivers == null)
-//						drivers = new HashMap<>();
-//					drivers.put(name[0], "In station");
-//					element.get().getMoreAttributes().put("drivers", drivers);
-//					this.elementDao.update(element.get());
-//					this.actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.getSequenceName()));
-//					return convertToMap(element.get());
-//				}
-//				throw new RuntimeException("the element isn't exist");
-//			} catch (Exception e) {
-//				new RuntimeException(e);
-//			}
-//			break;
-//
+		case "add-new-user":
+			action.setCreationTimestamp(new Date());
+			try {
+				Optional<ElementEntity> element = this.elementDao
+						.readById(action.getElementKey());
+				if (element.isPresent()) {
+//					if (element.get().getUsers() == null)
+//						users = new ArrayList<>();
+					element.get().getUsers().add("" + action.getProperties().get("newUser")); // adding the new user to the users list
+					user.get().getProjects().add(action.getElementKey()); // add the project to the user's list
+					this.userDao.update(user.get());
+					this.elementDao.update(element.get());
+					this.actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.getSequenceName()));
+					return convertToMap(element.get());
+				}
+				throw new RuntimeException("the element isn't exist");
+			} catch (Exception e) {
+				new RuntimeException(e);
+			}
+			break;
+
 //		case "check-out":
 //			action.setCreationTimestamp(new Date());
 //			try {

@@ -47,26 +47,26 @@ public class ElementUserController {
 		return new ElementBoundary(elementsService.getSpecificElement(elementKey));
 	}
 	
-//	@RequestMapping(
-//			path="/elements/{userEmail}",
-//			method=RequestMethod.GET,
-//			produces=MediaType.APPLICATION_JSON_VALUE)
-//	public ElementBoundary[] getElementsUsingPagination (
-//			@PathVariable("userEmail") String userEmail,
-//			@RequestParam(name="size", required=false, defaultValue="10") int size,
-//			@RequestParam(name="page", required=false, defaultValue="0") int page) {
-//		return 
-//				this.elementsService
-//				.getElementsUsingPagination(userEmail, size, page)
-//				.stream()
-//				.map(ElementBoundary::new)
-//				.collect(Collectors.toList())
-//				.toArray(new ElementBoundary[0]);
-//	}
+	@RequestMapping(
+			path="/elements/{userEmail}",
+			method=RequestMethod.GET,
+			produces=MediaType.APPLICATION_JSON_VALUE)
+	public ElementBoundary[] getElementsUsingPagination (
+			@PathVariable("userEmail") String userEmail,
+			@RequestParam(name="size", required=false, defaultValue="10") int size,
+			@RequestParam(name="page", required=false, defaultValue="0") int page) {
+		return 
+				this.elementsService
+				.getElementsUsingPagination(userEmail, size, page)
+				.stream()
+				.map(ElementBoundary::new)
+				.collect(Collectors.toList())
+				.toArray(new ElementBoundary[0]);
+	}
 
 
 	@RequestMapping(
-			path="/elements/{userEmail}/{elementKey}",
+			path="/elements/{userEmail}/{elementKey}/{type}",
 			method=RequestMethod.PUT,
 			produces=MediaType.APPLICATION_JSON_VALUE)
 	public void patchElement (

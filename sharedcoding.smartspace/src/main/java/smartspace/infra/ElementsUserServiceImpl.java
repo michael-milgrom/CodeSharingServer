@@ -67,32 +67,20 @@ public class ElementsUserServiceImpl implements ElementsUserService {
 
 	@Override
 	//@CheckRoleOfUser
-	public List<Optional<ElementEntity>> getElementsUsingPagination(String userEmail, int size, int page) { // TODO PAGINATION
+	public List<ElementEntity> getElementsUsingPagination(String userEmail, int size, int page) { // TODO PAGINATION
 		UserEntity user = this.userDao.readById(userEmail)
 				.orElseThrow(() -> new RuntimeException("There is no user with the given key"));
 		List<String> projects = user.getProjects();
-		List<Optional<ElementEntity>> elements_entities = new ArrayList<>();
+		List<ElementEntity> elements_entities = new ArrayList<>();
+		Optional<ElementEntity> element;
 		for(String elementKey: projects) {
-			elements_entities.add(this.elementDao.readById(elementKey));
+			element = this.elementDao.readById(elementKey);
+			if(element.isPresent())
+				elements_entities.add(this.elementDao.readById(elementKey).get());
 		}
 		return elements_entities;
 		//return this.elementDao.readAll(size, page);
 	}
-
-//	@Override
-//	//@CheckRoleOfUser
-//	public List<ElementEntity> getElementsUsingPaginationOfLocation(String userSmartspace, String userEmail, ActionType role,
-//			int x, int y, int distance, int size, int page) {
-//
-//		if (role == ActionType.MANAGER) {
-//			return this.elementDao.readAllUsingLocation(x, y, distance, size, page);
-//		} else if (role == ActionType.PLAYER) {
-//			return this.elementDao.readAllUsingLocationNotExpired(x, y, distance, size, page);
-//		} else {
-//			throw new RuntimeException(
-//					"The URl isn't match for manager or player. use another user or URL that match admin user");
-//		}
-//	}
 
 	@Override
 	//@CheckRoleOfUser

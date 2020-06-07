@@ -15,7 +15,7 @@ public interface ElementsUserService {
 	
 	public ElementEntity getSpecificElement(String elementKey);
 	
-	public List<Optional<ElementEntity>> getElementsUsingPagination(String userEmail,int size, int page);
+	public List<ElementEntity> getElementsUsingPagination(String userEmail,int size, int page);
 	
 //	public List<ElementEntity> getElementsUsingPaginationOfLocation(String userSmartspace, String userEmail, ActionType role,
 //			int x, int y, int distance, int size, int page);
