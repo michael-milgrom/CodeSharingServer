@@ -123,10 +123,10 @@ public class ElementsUserServiceImpl implements ElementsUserService {
 				&& entity.getCreator() != null && !entity.getCreator().trim().isEmpty() 
 				&& entity.getNumberOfLines() >=0 
 				&& entity.getUsers() != null 
-				&& entity.getElementId() != null && !entity.getElementId().trim().isEmpty()
+				//&& entity.getElementId() != null && !entity.getElementId().trim().isEmpty()
 				&& entity.getActiveUsers() != null
-				&& entity.getLinesOfCode() != null
-				&& entity.getLastEditTimestamp() != null;
+				&& entity.getLinesOfCode() != null;
+				//&& entity.getLastEditTimestamp() != null;
 	}
 
 }

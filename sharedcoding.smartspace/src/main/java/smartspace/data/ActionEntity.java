@@ -76,7 +76,6 @@ public class ActionEntity implements SmartspaceEntity<String> {
 		this.user = user;
 	}
 
-	@Enumerated(EnumType.STRING)
 	public String getActionType() {
 		return this.actionType;
 	}
