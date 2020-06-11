@@ -36,8 +36,12 @@ public class UserUsersServiceImpl implements UserUsersService{
 	}
 	
 	@Override
-	public UserEntity getUser(String email) {
-		return this.userDao.readById(email).get();
+	public UserEntity getUser(String email, String password) {
+		UserEntity user = this.userDao.readById(email).get();
+		if(user.getPassword().equals(password))
+			return user;
+		else
+			return null;
 	}
 
 	@Override

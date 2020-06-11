@@ -168,9 +168,9 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 //			}
 //			break;
 //
-//		default:
-//			throw new RuntimeException("Action type does not exist!");
-//		}
+		default:
+			throw new RuntimeException("Action type does not exist!");
+		}
 		return null;
 	}
 
