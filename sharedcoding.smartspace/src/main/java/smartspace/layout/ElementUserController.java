@@ -33,7 +33,7 @@ public class ElementUserController {
 	public ElementBoundary newElement(
 			@RequestBody ElementBoundary element, // TODO FIX?
 			@PathVariable("creatorEmail") String userEmail) {		
-		return new ElementBoundary(elementsService.newElement(element.convertToEntity()));		
+		return new ElementBoundary(elementsService.newElement(element.convertToEntity(), userEmail));		
 			}
 
 	

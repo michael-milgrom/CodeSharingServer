@@ -7,7 +7,8 @@ public interface UserUsersService {
 	
 	public UserEntity newUser(UserEntity user);
 	
-	public UserEntity getUser(String userEmail, String password);
+//	public UserEntity getUser(String userEmail, String password);
+	public UserEntity getUser(String userEmail);
 	
 	public void updateUser(UserEntity user);
 }

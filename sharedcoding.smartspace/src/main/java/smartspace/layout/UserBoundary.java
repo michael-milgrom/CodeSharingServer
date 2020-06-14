@@ -8,7 +8,7 @@ import java.util.List;
 import smartspace.data.ActionType;
 
 public class UserBoundary {
-	private UserForBoundary key;
+	private String email;
 	private String password;
 	private List<String> projects;
 	
@@ -16,9 +16,9 @@ public class UserBoundary {
 		
 	}
 
-	public UserBoundary(UserForBoundary key, String password, List<String> projects) {
+	public UserBoundary(String email, String password, List<String> projects) {
 		super();
-		this.key = key;
+		this.email = email;
 		this.password = password;
 		this.projects = new ArrayList<>(projects);
 	}
@@ -26,12 +26,8 @@ public class UserBoundary {
 
 	public UserBoundary(UserEntity entity) {
 		if(entity!=null) {
-			if(entity.getEmail() != null) {
-				this.key = new UserForBoundary(entity.getEmail());
-			}
-			else
-				this.key = null;
-			
+	
+			this.email = entity.getEmail();
 			this.password = entity.getPassword();
 			this.projects = new ArrayList<>(entity.getProjects());
 		}
@@ -42,20 +38,17 @@ public class UserBoundary {
 		
 		entity.setPassword(this.password);
 		entity.setProjects(this.projects);
-		
-		if(this.key!=null) {
-			entity.setEmail(this.key.getEmail());
-		}
+		entity.setEmail(this.email);
 		
 		return entity;
 	}
 
-	public UserForBoundary getKey() {
-		return key;
+	public String getEmail() {
+		return email;
 	}
 
-	public void setKey(UserForBoundary key) {
-		this.key = key;
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	public String getPassword() {
@@ -76,7 +69,7 @@ public class UserBoundary {
 
 	@Override
 	public String toString() {
-		return "UserBoundary [key=" + key + ", password=" + password + ", projects=" + projects + "]";
+		return "UserBoundary [email=" + email + ", password=" + password + ", projects=" + projects + "]";
 	}
 
 	

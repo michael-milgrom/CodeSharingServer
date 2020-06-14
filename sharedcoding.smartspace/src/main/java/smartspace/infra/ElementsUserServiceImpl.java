@@ -37,9 +37,15 @@ public class ElementsUserServiceImpl implements ElementsUserService {
 	@Override
 	@Transactional
 	//@CheckRoleOfUser
-	public ElementEntity newElement(ElementEntity element) {
+	public ElementEntity newElement(ElementEntity element, String creator) {
 		if (valiadate(element)) {
 			//TODO do delete//
+			Optional<UserEntity> user = this.userDao.readById(creator);
+			if (user.isPresent()) {
+				user.get().getProjects().add(element.getKey()); // add the project to the creator's list
+				this.userDao.update(user.get());
+			} else
+				throw new RuntimeException("The creator doesn't exist");
 			element.setLastEditTimestamp((new Date()));
 			this.elementDao.createWithId(element);
 			} 

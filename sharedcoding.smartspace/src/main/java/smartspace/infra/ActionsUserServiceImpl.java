@@ -176,21 +176,22 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 
 	public Map<String, Object> convertToMap(ActionEntity action) {
 		Map<String, Object> actionMap = new HashMap<String, Object>();
-		Map<String, String> keyMap = new HashMap<String, String>();
-		Map<String, String> elementMap = new HashMap<String, String>();
-		Map<String, String> playerMap = new HashMap<String, String>();
+		//Map<String, String> keyMap = new HashMap<String, String>();
+		//Map<String, String> elementMap = new HashMap<String, String>();
+		//Map<String, String> playerMap = new HashMap<String, String>();
 
-		keyMap.put("id", action.getActionId());
+		//keyMap.put("id", action.getActionId());
 
-		elementMap.put("id", action.getElementKey());
+		//elementMap.put("id", action.getElementKey());
 
-		playerMap.put("email", action.getUser());
-
-		actionMap.put("actionKey", keyMap);
+		//playerMap.put("email", action.getUser());
+		
+		actionMap.put("user", action.getUser());
+		actionMap.put("actionKey", action.getActionId());
 		actionMap.put("type", action.getActionType());
 		actionMap.put("created", action.getCreationTimestamp());
-		actionMap.put("element", elementMap);
-		actionMap.put("player", playerMap);
+		actionMap.put("element", action.getElementKey());
+		
 		actionMap.put("properties", action.getProperties());
 
 		return actionMap;
@@ -198,16 +199,14 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 
 	public Map<String, Object> convertToMap(ElementEntity element) {
 		Map<String, Object> elementMap = new HashMap<String, Object>();
-		Map<String, String> keyMap = new HashMap<String, String>();
-		Map<String, String> playerMap = new HashMap<String, String>();
+		//Map<String, String> keyMap = new HashMap<String, String>();
 
-		keyMap.put("id", element.getElementId());
+		//keyMap.put("id", element.getElementId());
 	
-		playerMap.put("email", element.getCreator());
+		elementMap.put("creator", element.getCreator());
 
-		elementMap.put("key", keyMap);
+		//elementMap.put("key", keyMap);
 		elementMap.put("name", element.getName());
-		elementMap.put("creator", playerMap);
 		elementMap.put("users", element.getUsers());
 		elementMap.put("active_users", element.getActiveUsers());
 		elementMap.put("numberOfLines", element.getNumberOfLines());
@@ -219,11 +218,8 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 
 	public Map<String, Object> convertToMap(UserEntity user) {
 		Map<String, Object> userMap = new HashMap<String, Object>();
-		Map<String, String> keyMap = new HashMap<String, String>();
 
-		keyMap.put("email", user.getEmail());
-
-		userMap.put("key", keyMap);
+		userMap.put("email", user.getEmail());
 		userMap.put("password", user.getPassword());
 		userMap.put("projects", user.getProjects());
 

@@ -9,7 +9,7 @@ import smartspace.data.ActionType;
 
 public interface ElementsUserService {
 	
-	public ElementEntity newElement(ElementEntity element);
+	public ElementEntity newElement(ElementEntity element, String creator);
 	
 	public void setElement(String elementId,ElementEntity element);
 	
