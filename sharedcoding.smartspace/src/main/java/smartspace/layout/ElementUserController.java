@@ -44,7 +44,7 @@ public class ElementUserController {
 	public ElementBoundary getSpecipicElementUsingId (
 			@PathVariable("userEmail") String userEmail,
 			@PathVariable("elementKey") String elementKey) {
-		return new ElementBoundary(elementsService.getSpecificElement(elementKey));
+		return new ElementBoundary(elementsService.getSpecificElement(userEmail, elementKey));
 	}
 	
 	@RequestMapping(

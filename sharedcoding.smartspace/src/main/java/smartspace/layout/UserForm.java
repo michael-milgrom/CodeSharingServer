@@ -41,6 +41,5 @@ public class UserForm {
 		this.projects = new ArrayList<>(projects);
 	}
 	
-	
 }
 

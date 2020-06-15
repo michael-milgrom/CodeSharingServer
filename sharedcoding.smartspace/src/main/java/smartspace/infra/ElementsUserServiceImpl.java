@@ -11,13 +11,11 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import smartspace.aop.CheckRoleOfUser;
 import smartspace.dao.EnhancedElementDao;
 import smartspace.dao.EnhancedUserDao;
 import smartspace.dao.SequenceDao;
 import smartspace.data.ElementEntity;
 import smartspace.data.UserEntity;
-import smartspace.data.ActionType;
 
 @Service
 public class ElementsUserServiceImpl implements ElementsUserService {
@@ -68,10 +66,13 @@ public class ElementsUserServiceImpl implements ElementsUserService {
 
 	@Override
 	//@CheckRoleOfUser
-	public ElementEntity getSpecificElement(String elementKey) {
-		// TODO CHECK EMAIL
-		return this.elementDao.readById(elementKey)
+	public ElementEntity getSpecificElement(String email, String elementKey) {
+		ElementEntity element = this.elementDao.readById(elementKey)
 				.orElseThrow(() -> new RuntimeException("There is no element with the given key"));
+		if(element.getUsers().contains(email))
+			return element;
+		else
+			throw new RuntimeException("The user doesn't has access to this project");
 	}
 
 	@Override
