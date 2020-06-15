@@ -42,7 +42,10 @@ public class ElementsUserServiceImpl implements ElementsUserService {
 			//TODO do delete//
 			Optional<UserEntity> user = this.userDao.readById(creator);
 			if (user.isPresent()) {
-				user.get().getProjects().add(element.getKey()); // add the project to the creator's list
+				if(!user.get().getProjects().contains(element.getKey()))
+					user.get().getProjects().add(element.getKey()); // add the project to the creator's list
+				else
+					throw new RuntimeException("The project already exists");
 				this.userDao.update(user.get());
 			} else
 				throw new RuntimeException("The creator doesn't exist");

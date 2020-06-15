@@ -85,19 +85,24 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 		case "add-new-user":
 			action.setCreationTimestamp(new Date());
 			try {
-				Optional<ElementEntity> element = this.elementDao
-						.readById(action.getElementKey());
+				Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
 				if (element.isPresent()) {
 //					if (element.get().getUsers() == null)
 //						users = new ArrayList<>();
-					element.get().getUsers().add("" + action.getProperties().get("newUser")); // adding the new user to the users list
-					user.get().getProjects().add(action.getElementKey()); // add the project to the user's list
-					this.userDao.update(user.get());
-					this.elementDao.update(element.get());
-					this.actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.getSequenceName()));
-					return convertToMap(element.get());
+					if (user.get().getEmail().equals(element.get().getCreator())) {
+						element.get().getUsers().add("" + action.getProperties().get("newUser")); // adding the new user
+																									// to the users list
+						user.get().getProjects().add(action.getElementKey()); // add the project to the user's list
+						this.userDao.update(user.get());
+						this.elementDao.update(element.get());
+						this.actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.getSequenceName()));
+						return convertToMap(element.get());
+					}
+					else
+						throw new RuntimeException("the user who've done the action is not the creator");
 				}
-				throw new RuntimeException("the element isn't exist");
+				else
+					throw new RuntimeException("the element isn't exist");
 			} catch (Exception e) {
 				new RuntimeException(e);
 			}
@@ -176,22 +181,22 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 
 	public Map<String, Object> convertToMap(ActionEntity action) {
 		Map<String, Object> actionMap = new HashMap<String, Object>();
-		//Map<String, String> keyMap = new HashMap<String, String>();
-		//Map<String, String> elementMap = new HashMap<String, String>();
-		//Map<String, String> playerMap = new HashMap<String, String>();
+		// Map<String, String> keyMap = new HashMap<String, String>();
+		// Map<String, String> elementMap = new HashMap<String, String>();
+		// Map<String, String> playerMap = new HashMap<String, String>();
 
-		//keyMap.put("id", action.getActionId());
+		// keyMap.put("id", action.getActionId());
 
-		//elementMap.put("id", action.getElementKey());
+		// elementMap.put("id", action.getElementKey());
 
-		//playerMap.put("email", action.getUser());
-		
+		// playerMap.put("email", action.getUser());
+
 		actionMap.put("user", action.getUser());
 		actionMap.put("actionKey", action.getActionId());
 		actionMap.put("type", action.getActionType());
 		actionMap.put("created", action.getCreationTimestamp());
 		actionMap.put("element", action.getElementKey());
-		
+
 		actionMap.put("properties", action.getProperties());
 
 		return actionMap;
@@ -199,13 +204,13 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 
 	public Map<String, Object> convertToMap(ElementEntity element) {
 		Map<String, Object> elementMap = new HashMap<String, Object>();
-		//Map<String, String> keyMap = new HashMap<String, String>();
+		// Map<String, String> keyMap = new HashMap<String, String>();
 
-		//keyMap.put("id", element.getElementId());
-	
+		// keyMap.put("id", element.getElementId());
+
 		elementMap.put("creator", element.getCreator());
 
-		//elementMap.put("key", keyMap);
+		// elementMap.put("key", keyMap);
 		elementMap.put("name", element.getName());
 		elementMap.put("users", element.getUsers());
 		elementMap.put("active_users", element.getActiveUsers());

@@ -11,21 +11,20 @@ public class ActionBoundary {
 	private String type;
 	private Date created;
 	private Key element;
-	private UserForBoundary player;
+	private String user;
 	private Map<String, Object> properties;
 	
 	public ActionBoundary() {
 		this.actionKey = new Key();
 		this.element = new Key();
-		this.player=new UserForBoundary();
 	}
 
 
-	public ActionBoundary(String type, Key element, UserForBoundary player, Map<String, Object> properties) {
+	public ActionBoundary(String type, Key element, String user, Map<String, Object> properties) {
 		super();
 		this.type = type;
 		this.element = element;
-		this.player = player;
+		this.user = user;
 		this.properties = properties;
 	}
 
@@ -43,8 +42,7 @@ public class ActionBoundary {
 		this.element.setId(entity.getActionId());
 		this.element.setUser(entity.getUser());
 		
-		this.player= new UserForBoundary();//??
-		this.player.setEmail(entity.getUser());
+		this.user= entity.getUser();
 		
 		this.properties = entity.getProperties();
 		}
@@ -63,8 +61,8 @@ public class ActionBoundary {
 			entity.setElementKey(this.element.getUser() + "-" + this.element.getId());
 		}
 		
-		if(this.player!=null) {
-			entity.setUser(this.player.getEmail());
+		if(this.user!=null) {
+			entity.setUser(this.user);
 		}
 		
 		entity.setProperties(this.properties);
@@ -103,12 +101,12 @@ public class ActionBoundary {
 		this.element = element;
 	}
 
-	public UserForBoundary getPlayer() {
-		return player;
+	public String getUser() {
+		return user;
 	}
 
-	public void setPlayer(UserForBoundary player) {
-		this.player = player;
+	public void setUser(String user) {
+		this.user = user;
 	}
 
 	public Map<String, Object> getProperties() {
@@ -122,7 +120,7 @@ public class ActionBoundary {
 	@Override
 	public String toString() {
 		return "ActionBoundary [actionKey=" + actionKey + ", type=" + type + ", created=" + created + ", element="
-				+ element + ", player=" + player + ", properties=" + properties + "]";
+				+ element + ", user=" + user + ", properties=" + properties + "]";
 	}
 
 

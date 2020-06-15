@@ -29,7 +29,7 @@ public class ActionUserController {
 			produces=MediaType.APPLICATION_JSON_VALUE)
 	public Map<String,Object> invokeAnAction(
 			@RequestBody ActionBoundary action) {		
-		return actionService.invokeAction(action.getPlayer().getEmail(),action.convertToEntity());
+		return actionService.invokeAction(action.getUser(),action.convertToEntity());
 	}
 }
 
