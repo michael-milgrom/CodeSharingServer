@@ -50,6 +50,13 @@ public class Line {
 	public void setLocked(boolean locked) {
 		this.locked = locked;
 	}
+
+
+	@Override
+	public String toString() {
+		return "{ number:" + number + ", code: " + code + ", locked: " + locked + "}";
+	}
+	
 	
 	
 }

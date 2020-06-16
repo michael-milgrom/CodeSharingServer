@@ -66,7 +66,7 @@ public class ElementUserController {
 
 
 	@RequestMapping(
-			path="/elements/{userEmail}/{elementKey}/{type}",
+			path="/elements/{userEmail}/{elementKey}",
 			method=RequestMethod.PUT,
 			produces=MediaType.APPLICATION_JSON_VALUE)
 	public void patchElement (
@@ -74,6 +74,20 @@ public class ElementUserController {
 			@PathVariable("elementKey") String elementKey,
 			@RequestBody ElementBoundary element){
 			this.elementsService
-			.setElement(elementKey,element.convertToEntity()); // TODO SEND EMAIL TOO
+			.setElement(userEmail, elementKey,element.convertToEntity()); // TODO SEND EMAIL TOO
+	}
+	
+	@RequestMapping(
+			path="/elements/{userEmail}/{elementKey}/{start}/{count}",
+			method=RequestMethod.PUT,
+			produces=MediaType.APPLICATION_JSON_VALUE)
+	public void updatSpecificElement (
+			@PathVariable("userEmail") String userEmail,
+			@PathVariable("elementKey") String elementKey,
+			@PathVariable("start") int start,
+			@PathVariable("count") int count,
+			@RequestBody ElementBoundary element){
+			this.elementsService
+			.setElementCode(userEmail,elementKey,element.convertToEntity()); // TODO SEND EMAIL TOO
 	}
 }

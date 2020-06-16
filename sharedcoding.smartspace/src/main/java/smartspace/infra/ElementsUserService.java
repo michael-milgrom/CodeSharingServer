@@ -9,7 +9,7 @@ public interface ElementsUserService {
 	
 	public ElementEntity newElement(ElementEntity element, String creator);
 	
-	public void setElement(String elementId,ElementEntity element);
+	public void setElement(String email, String elementId,ElementEntity element);
 	
 	public ElementEntity getSpecificElement(String email, String elementKey);
 	
@@ -22,4 +22,6 @@ public interface ElementsUserService {
 
 //	public List<ElementEntity> getElementsUsingPaginationOfSpecifiedType(String userSmartspace, String userEmail, ActionType role,
 //			String type, int size, int page);
+	
+	public void setElementCode(String email, String elementId,ElementEntity element);
 }

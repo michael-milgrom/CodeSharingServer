@@ -58,10 +58,23 @@ public class ElementsUserServiceImpl implements ElementsUserService {
 	@Override
 	@Transactional
 	//@CheckRoleOfUser
-	public void setElement(String elementId,ElementEntity element) {
-		//TODO CHECK THAT THE USER HAS PERMISSION TO EDIT
+	public void setElement(String email, String elementId,ElementEntity element) {
+		if(!element.getUsers().contains(email))
+			throw new RuntimeException("The user doesn't has access to this project");
 		element.setElementId(elementId);
 		this.elementDao.update(element);
+	}
+	
+	@Override
+	@Transactional
+	//@CheckRoleOfUser
+	public void setElementCode(String email, String elementId,ElementEntity element) {
+		if(!element.getUsers().contains(email))
+			throw new RuntimeException("The user doesn't has access to this project");
+		element.setElementId(elementId);
+		element.setLastEditTimestamp(new Date());
+		element.setNumberOfLines(element.getNumberOfLines());
+		this.elementDao.updateLinesOfCode(element);
 	}
 
 	@Override

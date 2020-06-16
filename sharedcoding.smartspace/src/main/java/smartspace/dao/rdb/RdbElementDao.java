@@ -149,5 +149,21 @@ public class RdbElementDao implements EnhancedElementDao<String> {
 		elementEntity.setKey(elementEntity.getCreator() + "-" + elementEntity.getName());
 		return this.create(elementEntity);
 	}
+	
+	@Override
+	@Transactional
+	public void updateLinesOfCode(ElementEntity element) {
+		ElementEntity existing = this.readById(element.getKey())
+				.orElseThrow(() -> new RuntimeException("not element to update"));
+		if (element.getLastEditTimestamp() != null)
+			existing.setLastEditTimestamp(element.getLastEditTimestamp());
+		if (element.getNumberOfLines() >= 0)
+			existing.setNumberOfLines(element.getNumberOfLines());
+		if (element.getLinesOfCode() != null)
+			existing.setLinesOfCode(element.getLinesOfCode());
+		
+		// SQL: UPDATE
+		this.elementCrud.save(existing);
+	}
 
 }

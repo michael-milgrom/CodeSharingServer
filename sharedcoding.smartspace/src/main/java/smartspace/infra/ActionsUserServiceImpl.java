@@ -21,6 +21,7 @@ import smartspace.dao.EnhancedUserDao;
 import smartspace.dao.SequenceDao;
 import smartspace.data.ActionEntity;
 import smartspace.data.ElementEntity;
+import smartspace.data.Line;
 import smartspace.data.UserEntity;
 import smartspace.data.ActionType;
 
@@ -55,40 +56,57 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 
 		String type = action.getActionType();
 //		String[] name = action.getUser().split("@");
+		Date now = new Date();
+		now.setHours((new Date()).getHours()+3);
 		switch (type) {
-//		case "echo":
-//			action.setCreationTimestamp(new Date());
-//			try {
-//				return convertToMap(actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.SEQUENCE_NAME)));
-//			} catch (Exception e) {
-//				new RuntimeException(e);
-//			}
-//			break;
-//		case "to-afeka":
-//			action.setCreationTimestamp(new Date());
-//			try {
-//				return convertToMap(actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.SEQUENCE_NAME)));
-//			} catch (Exception e) {
-//				new RuntimeException(e);
-//			}
-//			break;
-//
-//		case "from-afeka":
-//			action.setCreationTimestamp(new Date());
-//			try {
-//				return convertToMap(actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.SEQUENCE_NAME)));
-//			} catch (Exception e) {
-//				new RuntimeException(e);
-//			}
-//			break;
-//
-		case "add-new-user":
-			action.setCreationTimestamp(new Date());
+		case "lock":
+			action.setCreationTimestamp(now);
 			try {
 				Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
 				if (element.isPresent()) {
-//					if (element.get().getUsers() == null)
-//						users = new ArrayList<>();
+					List<Line> code = element.get().getLinesOfCode();
+					int start = (int) action.getProperties().get("start");
+					int count = (int) action.getProperties().get("count");
+					for (int i = start; i < start + count; i++) {
+						Line line = code.get(i);
+						if(!line.isLocked()) // if the line is not locked
+							line.setLocked(true);
+						else
+							throw new RuntimeException("the desired lines are already locked");
+					}
+					actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.SEQUENCE_NAME));
+					return convertToMap(element.get());
+				}
+			} catch (Exception e) {
+				new RuntimeException(e);
+			}
+			break;
+			
+		case "unlock":
+			action.setCreationTimestamp(now);
+			try {
+				Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
+				if (element.isPresent()) {
+					List<Line> code = element.get().getLinesOfCode();
+					int start = (int) action.getProperties().get("start");
+					int count = (int) action.getProperties().get("count");
+					for (int i = start; i < start + count; i++) {
+						Line line = code.get(i);
+						line.setLocked(false);
+					}
+					actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.SEQUENCE_NAME));
+					return convertToMap(element.get());
+				}
+			} catch (Exception e) {
+				new RuntimeException(e);
+			}
+			break;
+
+		case "add-new-user":
+			action.setCreationTimestamp(now);
+			try {
+				Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
+				if (element.isPresent()) {
 					if (user.get().getEmail().equals(element.get().getCreator())) {
 						element.get().getUsers().add("" + action.getProperties().get("newUser")); // adding the new user
 																									// to the users list
@@ -156,23 +174,25 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 //			}
 //			break;
 //
-//		case "in-station":
-//			action.setCreationTimestamp(new Date());
-//			try {
-//				Optional<ElementEntity> element = this.elementDao
-//						.readById(action.getElementSmartspace() + "=" + action.getElementId());
-//				if (element.isPresent()) {
-//					Map<String, Object> drivers = (Map<String, Object>) element.get().getMoreAttributes()
-//							.get("drivers");
-//					this.actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.getSequenceName()));
-//					return drivers;
-//				}
-//				throw new RuntimeException("the element doesn't exist");
-//			} catch (Exception e) {
-//				new RuntimeException(e);
-//			}
-//			break;
-//
+		case "edit-code":
+			action.setCreationTimestamp(now);
+			try {
+				Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
+				if (element.isPresent()) {
+					List<Line> code = (List<Line>) action.getProperties().get("code");
+					element.get().setLinesOfCode(code);
+					element.get().setLastEditTimestamp(now); // edited now
+					element.get().setNumberOfLines(code.size());
+					this.elementDao.updateLinesOfCode(element.get());
+					this.actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.getSequenceName()));
+					return convertToMap(element.get());
+				}
+				throw new RuntimeException("the element doesn't exist");
+			} catch (Exception e) {
+				new RuntimeException(e);
+			}
+			break;
+
 		default:
 			throw new RuntimeException("Action type does not exist!");
 		}

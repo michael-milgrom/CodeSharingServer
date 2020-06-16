@@ -29,7 +29,9 @@ public class ElementEntity implements SmartspaceEntity<String> {
 
 	public ElementEntity() {
 		this.numberOfLines = 0;
-		this.lastEditTimestamp = new Date();
+		Date now = new Date();
+		now.setHours((new Date()).getHours()+3);
+		this.lastEditTimestamp = now;
 		this.users = new ArrayList<String>();
 		this.activeUsers = new ArrayList<String>();
 		this.linesOfCode = new ArrayList<Line>();
