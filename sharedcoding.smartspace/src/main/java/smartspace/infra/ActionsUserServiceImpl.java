@@ -56,11 +56,12 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 		String type = action.getActionType();
 //		String[] name = action.getUser().split("@");
 		Date now = new Date();
-		now.setHours((new Date()).getHours()+3);
+		now.setHours((new Date()).getHours() + 3);
 		switch (type) {
 		case "lock":
 			action.setCreationTimestamp(now);
 			try {
+				System.out.println(convertToMap(action));
 				Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
 				if (element.isPresent()) {
 					List<Line> code = element.get().getLinesOfCode();
@@ -68,7 +69,7 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 					int count = (int) action.getProperties().get("count");
 					for (int i = start; i < start + count; i++) {
 						Line line = code.get(i);
-						if(!line.isLocked()) // if the line is not locked
+						if (!line.isLocked()) // if the line is not locked
 							line.setLocked(true);
 						else
 							throw new RuntimeException("the desired lines are already locked");
@@ -80,7 +81,7 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 				new RuntimeException(e);
 			}
 			break;
-			
+
 		case "unlock":
 			action.setCreationTimestamp(now);
 			try {
@@ -113,7 +114,8 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 						if (user.get().getEmail().equals(element.get().getCreator())) {
 							element.get().getUsers().add(newUserEmail); // adding the new user
 																		// to the users list
-							userToAdd.get().getProjects().add(action.getElementKey()); // add the project to the user's list
+							userToAdd.get().getProjects().add(action.getElementKey()); // add the project to the user's
+																						// list
 							this.userDao.update(userToAdd.get());
 							this.elementDao.update(element.get());
 							this.actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.getSequenceName()));
@@ -153,9 +155,31 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 				if (element.isPresent()) {
 					element.get().getActiveUsers().remove(user.get().getEmail());
 					this.elementDao.update(element.get());
-					actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.SEQUENCE_NAME)); 
+					actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.SEQUENCE_NAME));
 					return convertToMap(element.get());
 				}
+			} catch (Exception e) {
+				new RuntimeException(e);
+			}
+			break;
+
+		case "delete":
+			action.setCreationTimestamp(now);
+			try {
+				Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
+				if (element.isPresent()) {
+					element.get().getUsers().remove(user.get().getEmail());
+					element.get().getActiveUsers().remove(user.get().getEmail());
+					user.get().getProjects().remove(element.get().getKey());
+					if (element.get().getUsers().isEmpty())
+						this.elementDao.deleteByKey(element.get().getKey());
+					else
+						this.elementDao.update(element.get());
+					this.userDao.update(user.get());
+					this.actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.getSequenceName()));
+					return convertToMap(element.get());
+				} else
+					throw new RuntimeException("the element isn't exist");
 			} catch (Exception e) {
 				new RuntimeException(e);
 			}
