@@ -1,6 +1,5 @@
 package smartspace.infra;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -104,76 +103,64 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 
 		case "add-new-user":
 			action.setCreationTimestamp(now);
+			System.out.println(convertToMap(action));
 			try {
 				Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
 				if (element.isPresent()) {
-					if (user.get().getEmail().equals(element.get().getCreator())) {
-						element.get().getUsers().add("" + action.getProperties().get("newUser")); // adding the new user
-																									// to the users list
-						user.get().getProjects().add(action.getElementKey()); // add the project to the user's list
-						this.userDao.update(user.get());
-						this.elementDao.update(element.get());
-						this.actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.getSequenceName()));
-						return convertToMap(element.get());
+					String newUserEmail = (String) action.getProperties().get("newUser");
+					Optional<UserEntity> userToAdd = this.userDao.readById(newUserEmail);
+					if (userToAdd.isPresent()) {
+						if (user.get().getEmail().equals(element.get().getCreator())) {
+							element.get().getUsers().add(newUserEmail); // adding the new user
+																		// to the users list
+							userToAdd.get().getProjects().add(action.getElementKey()); // add the project to the user's list
+							this.userDao.update(userToAdd.get());
+							this.elementDao.update(element.get());
+							this.actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.getSequenceName()));
+							return convertToMap(element.get());
+						} else
+							throw new RuntimeException("the user who've done the action is not the creator");
+					} else {
+						throw new RuntimeException("the user doesn't exists");
 					}
-					else
-						throw new RuntimeException("the user who've done the action is not the creator");
-				}
-				else
-					throw new RuntimeException("the element isn't exist");
+
+				} else
+					throw new RuntimeException("the element doesn't exists");
 			} catch (Exception e) {
 				new RuntimeException(e);
 			}
 			break;
 
-//		case "check-out":
-//			action.setCreationTimestamp(new Date());
-//			try {
-//				Optional<ElementEntity> element = this.elementDao
-//						.readById(action.getElementSmartspace() + "=" + action.getElementId());
-//				if (element.isPresent()) {
-//					Map<String, Object> drivers = (Map<String, Object>) element.get().getMoreAttributes()
-//							.get("drivers");
-//					if (drivers != null) {
-//						drivers.remove(name[0]);
-//						element.get().getMoreAttributes().put("drivers", drivers);
-//						this.elementDao.update(element.get());
-//					}
-//					this.actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.getSequenceName()));
-//					return convertToMap(element.get());
-//				}
-//				throw new RuntimeException("the element isn't exist");
-//			} catch (Exception e) {
-//				new RuntimeException(e);
-//			}
-//			break;
-//
-//		case "transfer":
-//			action.setCreationTimestamp(new Date());
-//			try {
-//				Optional<UserEntity> from = this.userDao
-//						.readById(action.getPlayerSmartspace() + "=" + action.getPlayerEmail());
-//				String smart = (String) action.getMoreAttributes().get("smartspace");
-//				String em = (String) action.getMoreAttributes().get("email");
-//				long points = 100;
-//				Optional<UserEntity> to = this.userDao.readById(smart + "=" + em);
-//				if (to.isPresent()) {
-//					if (from.get().getPoints() >= points) {
-//						from.get().setPoints(from.get().getPoints() - points);
-//						to.get().setPoints(to.get().getPoints() + points);
-//						userDao.update(from.get());
-//						userDao.update(to.get());
-//						this.actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.getSequenceName()));
-//						return convertToMap(to.get());
-//					}
-//					throw new RuntimeException("the user doesn't have enough points");
-//				}
-//				throw new RuntimeException("the user doesn't exist");
-//			} catch (Exception e) {
-//				new RuntimeException(e);
-//			}
-//			break;
-//
+		case "login":
+			action.setCreationTimestamp(now);
+			try {
+				Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
+				if (element.isPresent()) {
+					element.get().getActiveUsers().add(user.get().getEmail());
+					this.elementDao.update(element.get());
+					actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.SEQUENCE_NAME));
+					return convertToMap(element.get());
+				}
+			} catch (Exception e) {
+				new RuntimeException(e);
+			}
+			break;
+
+		case "logout":
+			action.setCreationTimestamp(now);
+			try {
+				Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
+				if (element.isPresent()) {
+					element.get().getActiveUsers().remove(user.get().getEmail());
+					this.elementDao.update(element.get());
+					actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.SEQUENCE_NAME));
+					return convertToMap(element.get());
+				}
+			} catch (Exception e) {
+				new RuntimeException(e);
+			}
+			break;
+
 		case "edit-code":
 			action.setCreationTimestamp(now);
 			try {
