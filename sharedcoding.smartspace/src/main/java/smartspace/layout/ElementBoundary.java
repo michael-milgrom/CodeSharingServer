@@ -3,7 +3,7 @@ package smartspace.layout;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
+import java.util.LinkedList;
 
 import smartspace.data.ElementEntity;
 import smartspace.data.Line;
@@ -36,7 +36,7 @@ public class ElementBoundary {
 		this.lastEditTimestamp = lastEditTimestamp;
 		this.users = users;
 		this.activeUsers = activeUsers;
-		this.linesOfCode = linesOfCode;
+		this.linesOfCode = new LinkedList<>(linesOfCode);
 	}
 
 
@@ -59,7 +59,7 @@ public class ElementBoundary {
 			this.creator = entity.getCreator();
 			this.users = new ArrayList<>(entity.getUsers());
 			this.activeUsers = new ArrayList<>(entity.getActiveUsers());
-			this.linesOfCode = new ArrayList<>(entity.getLinesOfCode());
+			this.linesOfCode = new LinkedList<>(entity.getLinesOfCode());
 		}
 	}
 

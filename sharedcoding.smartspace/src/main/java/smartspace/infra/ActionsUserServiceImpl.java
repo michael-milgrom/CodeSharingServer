@@ -190,10 +190,37 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 			try {
 				Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
 				if (element.isPresent()) {
-					List<Line> code = (List<Line>) action.getProperties().get("code");
-					element.get().setLinesOfCode(code);
+					List<Line> linesOfCode = element.get().getLinesOfCode();
 					element.get().setLastEditTimestamp(now); // edited now
-					element.get().setNumberOfLines(code.size());
+					int start = (int) action.getProperties().get("start");
+					int end = (int) action.getProperties().get("end");
+					String text = (String) action.getProperties().get("code");
+					String [] stringArr = text.split("\n");
+					int length = stringArr.length;
+							
+					/*
+					 * delete locked lines - not relevant cause they changed
+					 */
+					for(int i = 0 ; i <= (end - start); i++) {
+						linesOfCode.remove(start);
+					}
+					
+					/*
+					 * add all new lines (and the locked lines) to the list
+					 */
+					for(int i=start, j=0 ; i < length+start ; i++,j++) {
+						Line tempLine = new Line(i,stringArr[j]);
+						linesOfCode.add(i, tempLine);
+					}
+					
+					/*
+					 * update all the line numbers
+					 */
+					for(int i = length+start; i <linesOfCode.size();i++) {
+						linesOfCode.get(i).setNumber(i);
+					}
+					element.get().setLinesOfCode(linesOfCode);
+					element.get().setNumberOfLines(linesOfCode.size());
 					this.elementDao.updateLinesOfCode(element.get());
 					this.actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.getSequenceName()));
 					return convertToMap(element.get());
@@ -239,15 +266,13 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 
 		// keyMap.put("id", element.getElementId());
 
-		elementMap.put("creator", element.getCreator());
-
-		// elementMap.put("key", keyMap);
 		elementMap.put("name", element.getName());
-		elementMap.put("users", element.getUsers());
-		elementMap.put("active_users", element.getActiveUsers());
+		elementMap.put("creator", element.getCreator());
 		elementMap.put("numberOfLines", element.getNumberOfLines());
-		elementMap.put("code", element.getLinesOfCode());
-		elementMap.put("last_edited", element.getLastEditTimestamp());
+		elementMap.put("users", element.getUsers());
+		elementMap.put("activeUsers", element.getActiveUsers());
+		elementMap.put("linesOfCode", element.getLinesOfCode());
+		//elementMap.put("last_edited", element.getLastEditTimestamp());
 
 		return elementMap;
 	}
@@ -260,5 +285,10 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 		userMap.put("projects", user.getProjects());
 
 		return userMap;
+	}
+	
+	public void setText(String text, int start, int end) {
+		
+		
 	}
 }

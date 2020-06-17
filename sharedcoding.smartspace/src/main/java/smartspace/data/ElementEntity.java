@@ -2,6 +2,7 @@ package smartspace.data;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.persistence.Temporal;
@@ -34,7 +35,7 @@ public class ElementEntity implements SmartspaceEntity<String> {
 		this.lastEditTimestamp = now;
 		this.users = new ArrayList<String>();
 		this.activeUsers = new ArrayList<String>();
-		this.linesOfCode = new ArrayList<Line>();
+		this.linesOfCode = new LinkedList<Line>();
 	}
 	
 	public ElementEntity(String name) {
@@ -54,7 +55,7 @@ public class ElementEntity implements SmartspaceEntity<String> {
 		this.lastEditTimestamp = lastEditTimestamp;
 		this.users = new ArrayList<String>(users);
 		this.activeUsers = new ArrayList<String>(activeUsers);
-		this.linesOfCode = new ArrayList<Line>(linesOfCode);
+		this.linesOfCode = new LinkedList<Line>(linesOfCode);
 	}
 
 	@JsonIgnore
@@ -123,7 +124,7 @@ public class ElementEntity implements SmartspaceEntity<String> {
 	}
 
 	public void setLinesOfCode(List<Line> linesOfCode) {
-		this.linesOfCode = new ArrayList<Line>(linesOfCode);
+		this.linesOfCode = new LinkedList<Line>(linesOfCode);
 	}
 
 	@Override
