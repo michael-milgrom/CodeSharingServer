@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.LinkedList;
 
+import smartspace.data.ActiveUser;
 import smartspace.data.ElementEntity;
 import smartspace.data.Line;
 
@@ -16,7 +17,7 @@ public class ElementBoundary {
 	private int numberOfLines;
 	private Date lastEditTimestamp;
 	private List<String> users;
-	private List<String> activeUsers;
+	private List<ActiveUser> activeUsers;
 	private List<Line> linesOfCode;
 	
 	
@@ -28,7 +29,7 @@ public class ElementBoundary {
 
 
 	public ElementBoundary(String name, String creator, int numberOfLines, Date lastEditTimestamp,
-			List<String> users, List<String> activeUsers, List<Line> linesOfCode) {
+			List<String> users, List<ActiveUser> activeUsers, List<Line> linesOfCode) {
 		super();
 		this.name = name;
 		this.creator = creator;
@@ -166,14 +167,14 @@ public class ElementBoundary {
 
 
 
-	public List<String> getActiveUsers() {
+	public List<ActiveUser> getActiveUsers() {
 		return activeUsers;
 	}
 
 
 
 
-	public void setActiveUsers(List<String> activeUsers) {
+	public void setActiveUsers(List<ActiveUser> activeUsers) {
 		this.activeUsers = activeUsers;
 	}
 

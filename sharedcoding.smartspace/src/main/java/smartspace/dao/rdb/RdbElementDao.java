@@ -161,6 +161,8 @@ public class RdbElementDao implements EnhancedElementDao<String> {
 			existing.setNumberOfLines(element.getNumberOfLines());
 		if (element.getLinesOfCode() != null)
 			existing.setLinesOfCode(element.getLinesOfCode());
+		if(element.getActiveUsers() != null)
+			existing.setActiveUsers(element.getActiveUsers());
 		
 		// SQL: UPDATE
 		this.elementCrud.save(existing);

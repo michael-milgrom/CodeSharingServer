@@ -11,6 +11,7 @@ import smartspace.data.ElementEntity;
 import smartspace.data.Line;
 import smartspace.data.UserEntity;
 import smartspace.data.ActionType;
+import smartspace.data.ActiveUser;
 
 @Component
 public class EntityFactoryImpl implements EntityFactory {
@@ -26,7 +27,7 @@ public class EntityFactoryImpl implements EntityFactory {
 
 	@Override
 	public ElementEntity createNewElement(String name, String creator, int numberOfLines, 
-			Date lastEditTimestamp, List<String> users, List<String> activeUsers, List<Line> linesOfCode) {
+			Date lastEditTimestamp, List<String> users, List<ActiveUser> activeUsers, List<Line> linesOfCode) {
 		return new ElementEntity(name, creator, numberOfLines, lastEditTimestamp, users, activeUsers, linesOfCode);
 	}
 

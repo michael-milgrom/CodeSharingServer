@@ -23,6 +23,7 @@ import smartspace.data.ElementEntity;
 import smartspace.data.Line;
 import smartspace.data.UserEntity;
 import smartspace.data.ActionType;
+import smartspace.data.ActiveUser;
 
 @Service
 public class ActionsUserServiceImpl implements ActionsUserService {
@@ -140,7 +141,7 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 			try {
 				Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
 				if (element.isPresent()) {
-					element.get().getActiveUsers().add(user.get().getEmail());
+					element.get().getActiveUsers().add(new ActiveUser(user.get().getEmail(), false, -1));
 					this.elementDao.update(element.get());
 					actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.SEQUENCE_NAME));
 					return convertToMap(element.get());
@@ -155,7 +156,7 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 			try {
 				Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
 				if (element.isPresent()) {
-					element.get().getActiveUsers().remove(user.get().getEmail());
+					element.get().getActiveUsers().removeIf(au -> au.getEmail().equals(user.get().getEmail()));
 					this.elementDao.update(element.get());
 					actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.SEQUENCE_NAME));
 					return convertToMap(element.get());
@@ -223,6 +224,11 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 					}
 					element.get().setLinesOfCode(linesOfCode);
 					element.get().setNumberOfLines(linesOfCode.size());
+					List<ActiveUser> actives = element.get().getActiveUsers();
+					for(ActiveUser activeUser: actives) {
+						if(activeUser.isEditing())
+							activeUser.setStart(activeUser.getStart()+length-(end-start));
+					}
 					this.elementDao.updateLinesOfCode(element.get());
 					this.actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.getSequenceName()));
 					return convertToMap(element.get());

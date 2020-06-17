@@ -23,7 +23,7 @@ public class ElementEntity implements SmartspaceEntity<String> {
 	private int numberOfLines;
 	private Date lastEditTimestamp;
 	private List<String> users;
-	private List<String> activeUsers;
+	private List<ActiveUser> activeUsers;
 	private List<Line> linesOfCode;
 	private String key;
 	private static final String SEQUENCE_NAME = "elements_sequence";
@@ -34,7 +34,7 @@ public class ElementEntity implements SmartspaceEntity<String> {
 		now.setHours((new Date()).getHours()+3);
 		this.lastEditTimestamp = now;
 		this.users = new ArrayList<String>();
-		this.activeUsers = new ArrayList<String>();
+		this.activeUsers = new ArrayList<ActiveUser>();
 		this.linesOfCode = new LinkedList<Line>();
 	}
 	
@@ -47,14 +47,14 @@ public class ElementEntity implements SmartspaceEntity<String> {
 	}
 	
 	public ElementEntity(String name, String creator, int numberOfLines, Date lastEditTimestamp, 
-			List<String> users, List<String> activeUsers, List<Line> linesOfCode) {
+			List<String> users, List<ActiveUser> activeUsers, List<Line> linesOfCode) {
 		super();
 		this.name = name;
 		this.creator = creator;
 		this.numberOfLines = numberOfLines;
 		this.lastEditTimestamp = lastEditTimestamp;
 		this.users = new ArrayList<String>(users);
-		this.activeUsers = new ArrayList<String>(activeUsers);
+		this.activeUsers = new ArrayList<ActiveUser>(activeUsers);
 		this.linesOfCode = new LinkedList<Line>(linesOfCode);
 	}
 
@@ -111,12 +111,12 @@ public class ElementEntity implements SmartspaceEntity<String> {
 		this.users = new ArrayList<String>(users);
 	}
 
-	public List<String> getActiveUsers() {
+	public List<ActiveUser> getActiveUsers() {
 		return this.activeUsers;
 	}
 
-	public void setActiveUsers(List<String> activeUsers) {
-		this.activeUsers = new ArrayList<String>(activeUsers);
+	public void setActiveUsers(List<ActiveUser> activeUsers) {
+		this.activeUsers = new ArrayList<ActiveUser>(activeUsers);
 	}
 
 	public List<Line> getLinesOfCode() {
