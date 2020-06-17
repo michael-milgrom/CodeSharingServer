@@ -68,6 +68,12 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 					List<Line> code = element.get().getLinesOfCode();
 					int start = (int) action.getProperties().get("start");
 					int count = (int) action.getProperties().get("count");
+					for(ActiveUser au : element.get().getActiveUsers()) // change the start
+						if(au.getEmail() == user.get().getEmail()) {
+							au.setEditing(true);
+							au.setStart(start);
+						}
+							
 					for (int i = start; i < start + count; i++) {
 						Line line = code.get(i);
 						if (!line.isLocked()) // if the line is not locked
@@ -92,6 +98,12 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 					List<Line> code = element.get().getLinesOfCode();
 					int start = (int) action.getProperties().get("start");
 					int count = (int) action.getProperties().get("count");
+					for(ActiveUser au : element.get().getActiveUsers()) 
+						if(au.getEmail() == user.get().getEmail()) {
+							au.setEditing(false);
+							au.setStart(-1);
+						}
+					
 					for (int i = start; i < start + count; i++) {
 						Line line = code.get(i);
 						line.setLocked(false);
@@ -172,7 +184,7 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 				Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
 				if (element.isPresent()) {
 					element.get().getUsers().remove(user.get().getEmail());
-					element.get().getActiveUsers().remove(user.get().getEmail());
+					element.get().getActiveUsers().removeIf(au -> au.getEmail() == user.get().getEmail());
 					user.get().getProjects().remove(element.get().getKey());
 					if (element.get().getUsers().isEmpty())
 						this.elementDao.deleteByKey(element.get().getKey());
@@ -224,8 +236,7 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 					}
 					element.get().setLinesOfCode(linesOfCode);
 					element.get().setNumberOfLines(linesOfCode.size());
-					List<ActiveUser> actives = element.get().getActiveUsers();
-					for(ActiveUser activeUser: actives) {
+					for(ActiveUser activeUser: element.get().getActiveUsers()) {
 						if(activeUser.isEditing())
 							activeUser.setStart(activeUser.getStart()+length-(end-start));
 					}
