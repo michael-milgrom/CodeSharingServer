@@ -74,13 +74,14 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 						else
 							throw new RuntimeException("the desired lines are already locked");
 					}
+					elementDao.updateLinesOfCode(element.get());
 					actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.SEQUENCE_NAME));
 					return convertToMap(element.get());
 				}
 			} catch (Exception e) {
-				new RuntimeException(e);
+				throw new RuntimeException(e);
 			}
-			break;
+			//break;
 
 		case "unlock":
 			action.setCreationTimestamp(now);
@@ -94,13 +95,14 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 						Line line = code.get(i);
 						line.setLocked(false);
 					}
+					elementDao.updateLinesOfCode(element.get());
 					actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.SEQUENCE_NAME));
 					return convertToMap(element.get());
 				}
 			} catch (Exception e) {
-				new RuntimeException(e);
+				throw new RuntimeException(e);
 			}
-			break;
+			//break;
 
 		case "add-new-user":
 			action.setCreationTimestamp(now);
@@ -129,9 +131,9 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 				} else
 					throw new RuntimeException("the element doesn't exists");
 			} catch (Exception e) {
-				new RuntimeException(e);
+				throw new RuntimeException(e);
 			}
-			break;
+			//break;
 
 		case "login":
 			action.setCreationTimestamp(now);
@@ -144,9 +146,9 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 					return convertToMap(element.get());
 				}
 			} catch (Exception e) {
-				new RuntimeException(e);
+				throw new RuntimeException(e);
 			}
-			break;
+			//break;
 
 		case "logout":
 			action.setCreationTimestamp(now);
@@ -159,9 +161,9 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 					return convertToMap(element.get());
 				}
 			} catch (Exception e) {
-				new RuntimeException(e);
+				throw new RuntimeException(e);
 			}
-			break;
+			//break;
 
 		case "delete":
 			action.setCreationTimestamp(now);
@@ -181,9 +183,9 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 				} else
 					throw new RuntimeException("the element isn't exist");
 			} catch (Exception e) {
-				new RuntimeException(e);
+				throw new RuntimeException(e);
 			}
-			break;
+			//break;
 
 		case "edit-code":
 			action.setCreationTimestamp(now);
@@ -227,14 +229,14 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 				}
 				throw new RuntimeException("the element doesn't exist");
 			} catch (Exception e) {
-				new RuntimeException(e);
+				throw new RuntimeException(e);
 			}
-			break;
+			//break;
 
 		default:
 			throw new RuntimeException("Action type does not exist!");
 		}
-		return null;
+		//return null;
 	}
 
 	public Map<String, Object> convertToMap(ActionEntity action) {

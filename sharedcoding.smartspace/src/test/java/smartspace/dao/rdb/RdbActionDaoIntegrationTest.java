@@ -21,7 +21,7 @@ import smartspace.data.ActionEntity;
 @SpringBootTest
 @TestPropertySource(properties= {"spring.profiles.active=default"})
 public class RdbActionDaoIntegrationTest {
-	
+/*	
 	private RdbActionDao actionDao;
 
 	@Autowired
@@ -29,7 +29,7 @@ public class RdbActionDaoIntegrationTest {
 		this.actionDao = actionDao;
 	}
 	
-	@Before // TODO harms the performance
+	@Before 
 	public void setup() {
 		this.actionDao.deleteAll();
 	}
@@ -110,5 +110,5 @@ public class RdbActionDaoIntegrationTest {
 		assertThat(rvAfterChange)
 		.hasSameSizeAs(rv);
 	}
-	
+*/	
 }

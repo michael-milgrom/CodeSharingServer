@@ -123,11 +123,4 @@ public class ActionBoundary {
 				+ element + ", user=" + user + ", properties=" + properties + "]";
 	}
 
-
-	public void convertToMap() {
-		// TODO Auto-generated method stub
-		
-	}
-	
-
 }

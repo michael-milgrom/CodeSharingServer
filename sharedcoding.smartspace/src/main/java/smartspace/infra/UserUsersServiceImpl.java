@@ -41,7 +41,7 @@ public class UserUsersServiceImpl implements UserUsersService{
 		if(user.getPassword().equals(password))
 			return user;
 		else
-			return null;
+			throw new RuntimeException("password does not match");
 	}
 //	@Override
 //	public UserEntity getUser(String email) {

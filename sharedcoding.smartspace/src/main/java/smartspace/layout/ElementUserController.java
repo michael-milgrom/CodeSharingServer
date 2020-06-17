@@ -31,7 +31,7 @@ public class ElementUserController {
 			consumes=MediaType.APPLICATION_JSON_VALUE,
 			produces=MediaType.APPLICATION_JSON_VALUE)
 	public ElementBoundary newElement(
-			@RequestBody ElementBoundary element, // TODO FIX?
+			@RequestBody ElementBoundary element, 
 			@PathVariable("creatorEmail") String userEmail) {		
 		return new ElementBoundary(elementsService.newElement(element.convertToEntity(), userEmail));		
 			}
@@ -74,7 +74,7 @@ public class ElementUserController {
 			@PathVariable("elementKey") String elementKey,
 			@RequestBody ElementBoundary element){
 			this.elementsService
-			.setElement(userEmail, elementKey,element.convertToEntity()); // TODO SEND EMAIL TOO
+			.setElement(userEmail, elementKey,element.convertToEntity()); 
 	}
 	
 	@RequestMapping(
@@ -88,6 +88,6 @@ public class ElementUserController {
 			@PathVariable("count") int count,
 			@RequestBody ElementBoundary element){
 			this.elementsService
-			.setElementCode(userEmail,elementKey,element.convertToEntity()); // TODO SEND EMAIL TOO
+			.setElementCode(userEmail,elementKey,element.convertToEntity());
 	}
 }

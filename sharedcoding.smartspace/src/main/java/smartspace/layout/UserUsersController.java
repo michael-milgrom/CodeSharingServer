@@ -42,16 +42,6 @@ public class UserUsersController {
 			return new UserBoundary(this.userService.getUser(userEmail, password));	
 			}
 	
-//	@RequestMapping(
-//			path="/users/login/{email}",
-//			method=RequestMethod.GET,
-//			consumes=MediaType.APPLICATION_JSON_VALUE,
-//			produces=MediaType.APPLICATION_JSON_VALUE)
-//	public UserBoundary getUser (
-//			@PathVariable("email") String userEmail) {		
-//			return new UserBoundary(this.userService.getUser(userEmail));	// TODO CHANGE IT
-//			}
-	
 	@RequestMapping(
 			path="/users/{email}",
 			method=RequestMethod.PUT,

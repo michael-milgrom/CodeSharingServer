@@ -37,7 +37,7 @@ public class ElementsUserServiceImpl implements ElementsUserService {
 	//@CheckRoleOfUser
 	public ElementEntity newElement(ElementEntity element, String creator) {
 		if (valiadate(element)) {
-			//TODO do delete//
+	
 			Optional<UserEntity> user = this.userDao.readById(creator);
 			if (user.isPresent()) {
 				if(!user.get().getProjects().contains(element.getKey()))
@@ -90,7 +90,7 @@ public class ElementsUserServiceImpl implements ElementsUserService {
 
 	@Override
 	//@CheckRoleOfUser
-	public List<ElementEntity> getElementsUsingPagination(String userEmail, int size, int page) { // TODO PAGINATION
+	public List<ElementEntity> getElementsUsingPagination(String userEmail, int size, int page) { 
 		UserEntity user = this.userDao.readById(userEmail)
 				.orElseThrow(() -> new RuntimeException("There is no user with the given key"));
 		List<String> projects = user.getProjects();
