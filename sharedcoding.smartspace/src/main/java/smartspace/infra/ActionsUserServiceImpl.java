@@ -153,7 +153,7 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 				if (element.isPresent()) {
 					element.get().getActiveUsers().remove(user.get().getEmail());
 					this.elementDao.update(element.get());
-					actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.SEQUENCE_NAME));
+					actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.SEQUENCE_NAME)); 
 					return convertToMap(element.get());
 				}
 			} catch (Exception e) {
