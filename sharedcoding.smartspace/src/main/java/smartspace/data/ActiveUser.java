@@ -4,6 +4,7 @@ public class ActiveUser {
 	private String email;
 	private boolean isEditing;
 	private int start;
+	private int beforeEditLength;
 	
 	
 	public ActiveUser() {
@@ -12,11 +13,12 @@ public class ActiveUser {
 
 
 
-	public ActiveUser(String email, boolean isEditing, int start) {
+	public ActiveUser(String email, boolean isEditing, int start, int beforeEditLength) {
 		super();
 		this.email = email;
 		this.isEditing = isEditing;
 		this.start = start;
+		this.beforeEditLength = beforeEditLength;
 	}
 	
 	public ActiveUser(ActiveUser user) {
@@ -24,6 +26,7 @@ public class ActiveUser {
 		this.email = user.email;
 		this.isEditing = user.isEditing;
 		this.start = user.start;
+		this.beforeEditLength = user.beforeEditLength;
 	}
 
 
@@ -59,6 +62,17 @@ public class ActiveUser {
 
 	public void setStart(int start) {
 		this.start = start;
+	}
+
+
+	public int getBeforeEditLength() {
+		return beforeEditLength;
+	}
+
+
+
+	public void setBeforeEditLength(int beforeEditLength) {
+		this.beforeEditLength = beforeEditLength;
 	}
 
 

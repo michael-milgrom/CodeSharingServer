@@ -1,5 +1,6 @@
 package smartspace.infra;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -69,9 +70,10 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 					int start = (int) action.getProperties().get("start");
 					int count = (int) action.getProperties().get("count");
 					for(ActiveUser au : element.get().getActiveUsers()) // change the start
-						if(au.getEmail() == user.get().getEmail()) {
+						if(au.getEmail().equals(user.get().getEmail())) {
 							au.setEditing(true);
 							au.setStart(start);
+							au.setBeforeEditLength(count);
 						}
 							
 					for (int i = start; i < start + count; i++) {
@@ -96,15 +98,17 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 				Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
 				if (element.isPresent()) {
 					List<Line> code = element.get().getLinesOfCode();
-					int start = (int) action.getProperties().get("start");
-					int count = (int) action.getProperties().get("count");
+					int start = 0;
+					int length = (int) action.getProperties().get("length");
 					for(ActiveUser au : element.get().getActiveUsers()) 
-						if(au.getEmail() == user.get().getEmail()) {
+						if(au.getEmail().equals(user.get().getEmail())) {
+							start = au.getStart();
 							au.setEditing(false);
 							au.setStart(-1);
+							au.setBeforeEditLength(0);
 						}
 					
-					for (int i = start; i < start + count; i++) {
+					for (int i = start; i < start + length; i++) {
 						Line line = code.get(i);
 						line.setLocked(false);
 					}
@@ -153,7 +157,7 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 			try {
 				Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
 				if (element.isPresent()) {
-					element.get().getActiveUsers().add(new ActiveUser(user.get().getEmail(), false, -1));
+					element.get().getActiveUsers().add(new ActiveUser(user.get().getEmail(), false, -1, 0));
 					this.elementDao.update(element.get());
 					actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.SEQUENCE_NAME));
 					return convertToMap(element.get());
@@ -184,7 +188,7 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 				Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
 				if (element.isPresent()) {
 					element.get().getUsers().remove(user.get().getEmail());
-					element.get().getActiveUsers().removeIf(au -> au.getEmail() == user.get().getEmail());
+					element.get().getActiveUsers().removeIf(au -> au.getEmail().equals(user.get().getEmail()));
 					user.get().getProjects().remove(element.get().getKey());
 					if (element.get().getUsers().isEmpty())
 						this.elementDao.deleteByKey(element.get().getKey());
@@ -207,16 +211,38 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 				if (element.isPresent()) {
 					List<Line> linesOfCode = element.get().getLinesOfCode();
 					element.get().setLastEditTimestamp(now); // edited now
-					int start = (int) action.getProperties().get("start");
-					int end = (int) action.getProperties().get("end");
+					String event = (String) action.getProperties().get("event");
+					int start = 0;
+					int beforeLength = 0;
+					for(ActiveUser au : element.get().getActiveUsers()) 
+						if(au.getEmail().equals(user.get().getEmail())) {
+							start = au.getStart();
+							beforeLength = au.getBeforeEditLength();
+						}
+					if(event.equals("BACK_SPACE")) {
+						start--;
+						beforeLength++;
+					}
+					if(event.equals("DELETE")) {
+						beforeLength++;
+					}
+					System.out.println("start = " + start);
+					//int end = (int) action.getProperties().get("end");
+					System.out.println("beforeLength = " + beforeLength);
 					String text = (String) action.getProperties().get("code");
-					String [] stringArr = text.split("\n");
-					int length = stringArr.length;
+					String [] stringArr = {""};
+					int length = 0;
+					if(text != null && !text.equals("")) {
+						stringArr = text.split("\n");
+						length = stringArr.length;
+						System.out.println("length = " + length);
+					}
 							
 					/*
-					 * delete locked lines - not relevant cause they changed
+					 * remove the out dated lines
 					 */
-					for(int i = 0 ; i <= (end - start); i++) {
+					for(int i = 0 ; i < beforeLength; i++) {
+						System.out.println("*** " + linesOfCode.get(start));
 						linesOfCode.remove(start);
 					}
 					
@@ -237,8 +263,9 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 					element.get().setLinesOfCode(linesOfCode);
 					element.get().setNumberOfLines(linesOfCode.size());
 					for(ActiveUser activeUser: element.get().getActiveUsers()) {
-						if(activeUser.isEditing())
-							activeUser.setStart(activeUser.getStart()+length-(end-start));
+						if(!activeUser.getEmail().equals(user.get().getEmail()) 
+								&& activeUser.isEditing())
+							activeUser.setStart(activeUser.getStart()+length-(beforeLength));
 					}
 					this.elementDao.updateLinesOfCode(element.get());
 					this.actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.getSequenceName()));
@@ -304,10 +331,5 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 		userMap.put("projects", user.getProjects());
 
 		return userMap;
-	}
-	
-	public void setText(String text, int start, int end) {
-		
-		
 	}
 }
