@@ -1,22 +1,19 @@
-package smartspace.data;
+package smartspace.layout;
 
-import javax.persistence.Embeddable;
-
-@Embeddable
-public class Line {
+public class LineForBoundary {
 	
 	private int number;
 	private String code;
 	private boolean locked;
 	
-	public Line(int number, String code) {
+	public LineForBoundary(int number, String code) {
 		super();
 		this.number = number;
 		this.code = code;
 		this.locked = false;
 	}
 	
-	public Line(int number, String code, boolean locked) {
+	public LineForBoundary(int number, String code, boolean locked) {
 		super();
 		this.number = number;
 		this.code = code;
@@ -24,7 +21,7 @@ public class Line {
 	}
 
 
-	public Line() {
+	public LineForBoundary() {
 		super();
 	}
 
@@ -57,13 +54,4 @@ public class Line {
 	public void setLocked(boolean locked) {
 		this.locked = locked;
 	}
-
-
-	@Override
-	public String toString() {
-		return "{ number:" + number + ", code: " + code + ", locked: " + locked + "}";
-	}
-	
-	
-	
 }

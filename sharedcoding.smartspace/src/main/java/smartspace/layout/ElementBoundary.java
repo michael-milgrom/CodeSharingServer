@@ -18,7 +18,7 @@ public class ElementBoundary {
 	private Date lastEditTimestamp;
 	private List<String> users;
 	private List<ActiveUser> activeUsers;
-	private List<Line> linesOfCode;
+	private List<LineForBoundary> linesOfCode;
 	
 	
 	public ElementBoundary() {
@@ -29,7 +29,7 @@ public class ElementBoundary {
 
 
 	public ElementBoundary(String name, String creator, int numberOfLines, Date lastEditTimestamp,
-			List<String> users, List<ActiveUser> activeUsers, List<Line> linesOfCode) {
+			List<String> users, List<ActiveUser> activeUsers, List<LineForBoundary> linesOfCode) {
 		super();
 		this.name = name;
 		this.creator = creator;
@@ -60,7 +60,11 @@ public class ElementBoundary {
 			this.creator = entity.getCreator();
 			this.users = new ArrayList<>(entity.getUsers());
 			this.activeUsers = new ArrayList<>(entity.getActiveUsers());
-			this.linesOfCode = new LinkedList<>(entity.getLinesOfCode());
+			this.linesOfCode = new LinkedList<>();
+			if(entity.getLinesOfCode() != null) {
+				for(Line line : entity.getLinesOfCode())
+					this.linesOfCode.add(new LineForBoundary(line.getNumber(), line.getCode(), line.isLocked()));
+			}
 		}
 	}
 
@@ -74,7 +78,15 @@ public class ElementBoundary {
 		entity.setName(this.name);
 		entity.setNumberOfLines(this.numberOfLines);
 		entity.setLastEditTimestamp(this.lastEditTimestamp);
-		entity.setLinesOfCode(this.linesOfCode);
+		
+		List<Line> lines = new LinkedList<>();
+		
+		if(this.linesOfCode != null) {
+			for(LineForBoundary line : this.linesOfCode)
+				lines.add(new Line(line.getNumber(), line.getCode(), line.isLocked()));
+		}
+		
+		entity.setLinesOfCode(lines);
 		entity.setCreator(this.creator);
 		
 		return entity;
@@ -181,14 +193,14 @@ public class ElementBoundary {
 
 
 
-	public List<Line> getLinesOfCode() {
+	public List<LineForBoundary> getLinesOfCode() {
 		return linesOfCode;
 	}
 
 
 
 
-	public void setLinesOfCode(List<Line> linesOfCode) {
+	public void setLinesOfCode(List<LineForBoundary> linesOfCode) {
 		this.linesOfCode = linesOfCode;
 	}
 

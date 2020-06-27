@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -23,6 +24,7 @@ import smartspace.data.ActionEntity;
 import smartspace.data.ElementEntity;
 import smartspace.data.Line;
 import smartspace.data.UserEntity;
+import smartspace.layout.ActionBoundary;
 import smartspace.data.ActionType;
 import smartspace.data.ActiveUser;
 
@@ -47,7 +49,6 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 
 	@Override
 	@Transactional
-	// @CheckRoleOfUser
 	public Map<String, Object> invokeAction(String email, ActionEntity action) {
 		Optional<UserEntity> user = this.userDao.readById(email);
 		if (user.isPresent()) {
@@ -56,7 +57,6 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 			throw new RuntimeException("The user doesn't exist");
 
 		String type = action.getActionType();
-//		String[] name = action.getUser().split("@");
 		Date now = new Date();
 		now.setHours((new Date()).getHours() + 3);
 		switch (type) {
@@ -70,7 +70,7 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 					int start = (int) action.getProperties().get("start");
 					int count = (int) action.getProperties().get("count");
 					for(ActiveUser au : element.get().getActiveUsers()) // change the start
-						if(au.getEmail().equals(user.get().getEmail())) {
+						if(au.getEmail().equals(user.get().getEmail())) { // TODO RETURN FALSE IF ALREADY LOCKED
 							au.setEditing(true);
 							au.setStart(start);
 							au.setBeforeEditLength(count);
@@ -90,7 +90,6 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
-			//break;
 
 		case "unlock":
 			action.setCreationTimestamp(now);
@@ -119,7 +118,6 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
-			//break;
 
 		case "add-new-user":
 			action.setCreationTimestamp(now);
@@ -150,7 +148,6 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
-			//break;
 
 		case "login":
 			action.setCreationTimestamp(now);
@@ -165,7 +162,6 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
-			//break;
 
 		case "logout":
 			action.setCreationTimestamp(now);
@@ -180,7 +176,6 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
-			//break;
 
 		case "delete":
 			action.setCreationTimestamp(now);
@@ -202,7 +197,6 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
-			//break;
 
 		case "edit-code":
 			action.setCreationTimestamp(now);
@@ -214,21 +208,29 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 					String event = (String) action.getProperties().get("event");
 					int start = 0;
 					int beforeLength = 0;
+					boolean locked = false;
 					for(ActiveUser au : element.get().getActiveUsers()) 
 						if(au.getEmail().equals(user.get().getEmail())) {
 							start = au.getStart();
 							beforeLength = au.getBeforeEditLength();
 						}
 					if(event.equals("BACK_SPACE")) {
-						start--;
-						beforeLength++;
+						if(element.get().getLinesOfCode().get(start-1).isLocked())
+							locked = true;
+						else {
+							start--;
+							beforeLength++;
+						}
 					}
 					if(event.equals("DELETE")) {
-						beforeLength++;
+						if(element.get().getLinesOfCode().get(start+1).isLocked())
+							locked = true;
+						else
+							beforeLength++;
 					}
 					System.out.println("start = " + start);
-					//int end = (int) action.getProperties().get("end");
 					System.out.println("beforeLength = " + beforeLength);
+					
 					String text = (String) action.getProperties().get("code");
 					String [] stringArr = {""};
 					int length = 0;
@@ -237,6 +239,7 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 						length = stringArr.length;
 						System.out.println("length = " + length);
 					}
+					
 							
 					/*
 					 * remove the out dated lines
@@ -254,12 +257,6 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 						linesOfCode.add(i, tempLine);
 					}
 					
-					/*
-					 * update all the line numbers
-					 */
-					for(int i = length+start; i <linesOfCode.size();i++) {
-						linesOfCode.get(i).setNumber(i);
-					}
 					element.get().setLinesOfCode(linesOfCode);
 					element.get().setNumberOfLines(linesOfCode.size());
 					for(ActiveUser activeUser: element.get().getActiveUsers()) {
@@ -269,31 +266,50 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 					}
 					this.elementDao.updateLinesOfCode(element.get());
 					this.actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.getSequenceName()));
-					return convertToMap(element.get());
+					
+					Map<String, Object> result = convertToMap(element.get());
+					if(locked) {
+						result.put("error", "The line that you're trying to reach is locked by another user.");
+					}
+					else
+						result.put("error", "");
+					
+					return result;
 				}
 				throw new RuntimeException("the element doesn't exist");
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
-			//break;
-
+		case "connect":
+			try {
+				return null;
+			}
+			catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+			
+		case "logs":
+			try {
+				Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
+				if (element.isPresent()) {
+					List<ActionEntity> actions = this.actionDao.readActionsWithElementKey(action.getElementKey(), 10, 0);
+					Map<String, Object> result = new HashMap<>();
+					for(ActionEntity ae: actions)
+						result.put(ae.getActionId(), ae);
+					return result;
+				}
+			}
+			catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+			
 		default:
 			throw new RuntimeException("Action type does not exist!");
 		}
-		//return null;
 	}
 
 	public Map<String, Object> convertToMap(ActionEntity action) {
 		Map<String, Object> actionMap = new HashMap<String, Object>();
-		// Map<String, String> keyMap = new HashMap<String, String>();
-		// Map<String, String> elementMap = new HashMap<String, String>();
-		// Map<String, String> playerMap = new HashMap<String, String>();
-
-		// keyMap.put("id", action.getActionId());
-
-		// elementMap.put("id", action.getElementKey());
-
-		// playerMap.put("email", action.getUser());
 
 		actionMap.put("user", action.getUser());
 		actionMap.put("actionKey", action.getActionId());
@@ -308,9 +324,6 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 
 	public Map<String, Object> convertToMap(ElementEntity element) {
 		Map<String, Object> elementMap = new HashMap<String, Object>();
-		// Map<String, String> keyMap = new HashMap<String, String>();
-
-		// keyMap.put("id", element.getElementId());
 
 		elementMap.put("name", element.getName());
 		elementMap.put("creator", element.getCreator());
@@ -318,7 +331,6 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 		elementMap.put("users", element.getUsers());
 		elementMap.put("activeUsers", element.getActiveUsers());
 		elementMap.put("linesOfCode", element.getLinesOfCode());
-		//elementMap.put("last_edited", element.getLastEditTimestamp());
 
 		return elementMap;
 	}

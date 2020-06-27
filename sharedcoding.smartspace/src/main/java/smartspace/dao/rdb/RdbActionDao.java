@@ -82,7 +82,7 @@ public class RdbActionDao implements EnhancedActionDao {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<ActionEntity> readMessageWithElementKeyContaining(String elementKey, int size, int page) {
+	public List<ActionEntity> readActionsWithElementKey(String elementKey, int size, int page) {
 		return this.actionCrud.findAllByElementKeyLike("%" + elementKey + "%", PageRequest.of(page, size));
 	}
 
