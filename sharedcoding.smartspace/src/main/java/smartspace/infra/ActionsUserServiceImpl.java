@@ -50,261 +50,270 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 	@Override
 	@Transactional
 	public Map<String, Object> invokeAction(String email, ActionEntity action) {
-		Optional<UserEntity> user = this.userDao.readById(email);
-		if (user.isPresent()) {
-			// TODO MAYBE SHOW THAT HE IS EDITING OR SOMETHING
-		} else
-			throw new RuntimeException("The user doesn't exist");
-
-		String type = action.getActionType();
 		Date now = new Date();
 		now.setHours((new Date()).getHours() + 3);
-		switch (type) {
-		case "lock":
+		String type = action.getActionType();
+		if (type.equals("connect")) {
 			action.setCreationTimestamp(now);
-			try {
+			return null;
+		}
+		else {
+			Optional<UserEntity> user = this.userDao.readById(email);
+			if (user.isPresent()) {
+				// TODO MAYBE SHOW THAT HE IS EDITING OR SOMETHING
+			} else
+				throw new RuntimeException("The user doesn't exist");
+
+			switch (type) {
+			case "lock":
+				action.setCreationTimestamp(now);
+				try {
+					System.out.println(convertToMap(action));
+					Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
+					if (element.isPresent()) {
+						List<Line> code = element.get().getLinesOfCode();
+						int start = (int) action.getProperties().get("start");
+						int count = (int) action.getProperties().get("count");
+						for (ActiveUser au : element.get().getActiveUsers()) // change the start
+							if (au.getEmail().equals(user.get().getEmail())) { // TODO RETURN FALSE IF ALREADY LOCKED
+								au.setEditing(true);
+								au.setStart(start);
+								au.setBeforeEditLength(count);
+							}
+
+						for (int i = start; i < start + count; i++) {
+							Line line = code.get(i);
+							if (!line.isLocked()) // if the line is not locked
+								line.setLocked(true);
+							else
+								throw new RuntimeException("the desired lines are already locked");
+						}
+						elementDao.updateLinesOfCode(element.get());
+						actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.SEQUENCE_NAME));
+						return convertToMap(element.get());
+					}
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+
+			case "unlock":
+				action.setCreationTimestamp(now);
+				try {
+					Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
+					if (element.isPresent()) {
+						List<Line> code = element.get().getLinesOfCode();
+						int start = 0;
+						int length = (int) action.getProperties().get("length");
+						for (ActiveUser au : element.get().getActiveUsers())
+							if (au.getEmail().equals(user.get().getEmail())) {
+								start = au.getStart();
+								au.setEditing(false);
+								au.setStart(-1);
+								au.setBeforeEditLength(0);
+							}
+
+						for (int i = start; i < start + length; i++) {
+							Line line = code.get(i);
+							line.setLocked(false);
+						}
+						elementDao.updateLinesOfCode(element.get());
+						actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.SEQUENCE_NAME));
+						return convertToMap(element.get());
+					}
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+
+			case "add-new-user":
+				action.setCreationTimestamp(now);
 				System.out.println(convertToMap(action));
-				Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
-				if (element.isPresent()) {
-					List<Line> code = element.get().getLinesOfCode();
-					int start = (int) action.getProperties().get("start");
-					int count = (int) action.getProperties().get("count");
-					for(ActiveUser au : element.get().getActiveUsers()) // change the start
-						if(au.getEmail().equals(user.get().getEmail())) { // TODO RETURN FALSE IF ALREADY LOCKED
-							au.setEditing(true);
-							au.setStart(start);
-							au.setBeforeEditLength(count);
+				try {
+					Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
+					if (element.isPresent()) {
+						String newUserEmail = (String) action.getProperties().get("newUser");
+						Optional<UserEntity> userToAdd = this.userDao.readById(newUserEmail);
+						if (userToAdd.isPresent()) {
+							if (user.get().getEmail().equals(element.get().getCreator())) {
+								element.get().getUsers().add(newUserEmail); // adding the new user
+																			// to the users list
+								userToAdd.get().getProjects().add(action.getElementKey()); // add the project to the
+																							// user's
+																							// list
+								this.userDao.update(userToAdd.get());
+								this.elementDao.update(element.get());
+								this.actionDao.createWithId(action,
+										sequenceDao.newEntity(ActionEntity.getSequenceName()));
+								return convertToMap(element.get());
+							} else
+								throw new RuntimeException("the user who've done the action is not the creator");
+						} else {
+							throw new RuntimeException("the user doesn't exists");
 						}
-							
-					for (int i = start; i < start + count; i++) {
-						Line line = code.get(i);
-						if (!line.isLocked()) // if the line is not locked
-							line.setLocked(true);
-						else
-							throw new RuntimeException("the desired lines are already locked");
-					}
-					elementDao.updateLinesOfCode(element.get());
-					actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.SEQUENCE_NAME));
-					return convertToMap(element.get());
+
+					} else
+						throw new RuntimeException("the element doesn't exists");
+				} catch (Exception e) {
+					throw new RuntimeException(e);
 				}
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
 
-		case "unlock":
-			action.setCreationTimestamp(now);
-			try {
-				Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
-				if (element.isPresent()) {
-					List<Line> code = element.get().getLinesOfCode();
-					int start = 0;
-					int length = (int) action.getProperties().get("length");
-					for(ActiveUser au : element.get().getActiveUsers()) 
-						if(au.getEmail().equals(user.get().getEmail())) {
-							start = au.getStart();
-							au.setEditing(false);
-							au.setStart(-1);
-							au.setBeforeEditLength(0);
-						}
-					
-					for (int i = start; i < start + length; i++) {
-						Line line = code.get(i);
-						line.setLocked(false);
-					}
-					elementDao.updateLinesOfCode(element.get());
-					actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.SEQUENCE_NAME));
-					return convertToMap(element.get());
-				}
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-
-		case "add-new-user":
-			action.setCreationTimestamp(now);
-			System.out.println(convertToMap(action));
-			try {
-				Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
-				if (element.isPresent()) {
-					String newUserEmail = (String) action.getProperties().get("newUser");
-					Optional<UserEntity> userToAdd = this.userDao.readById(newUserEmail);
-					if (userToAdd.isPresent()) {
-						if (user.get().getEmail().equals(element.get().getCreator())) {
-							element.get().getUsers().add(newUserEmail); // adding the new user
-																		// to the users list
-							userToAdd.get().getProjects().add(action.getElementKey()); // add the project to the user's
-																						// list
-							this.userDao.update(userToAdd.get());
-							this.elementDao.update(element.get());
-							this.actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.getSequenceName()));
-							return convertToMap(element.get());
-						} else
-							throw new RuntimeException("the user who've done the action is not the creator");
-					} else {
-						throw new RuntimeException("the user doesn't exists");
-					}
-
-				} else
-					throw new RuntimeException("the element doesn't exists");
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-
-		case "login":
-			action.setCreationTimestamp(now);
-			try {
-				Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
-				if (element.isPresent()) {
-					element.get().getActiveUsers().add(new ActiveUser(user.get().getEmail(), false, -1, 0));
-					this.elementDao.update(element.get());
-					actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.SEQUENCE_NAME));
-					return convertToMap(element.get());
-				}
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-
-		case "logout":
-			action.setCreationTimestamp(now);
-			try {
-				Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
-				if (element.isPresent()) {
-					element.get().getActiveUsers().removeIf(au -> au.getEmail().equals(user.get().getEmail()));
-					this.elementDao.update(element.get());
-					actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.SEQUENCE_NAME));
-					return convertToMap(element.get());
-				}
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-
-		case "delete":
-			action.setCreationTimestamp(now);
-			try {
-				Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
-				if (element.isPresent()) {
-					element.get().getUsers().remove(user.get().getEmail());
-					element.get().getActiveUsers().removeIf(au -> au.getEmail().equals(user.get().getEmail()));
-					user.get().getProjects().remove(element.get().getKey());
-					if (element.get().getUsers().isEmpty())
-						this.elementDao.deleteByKey(element.get().getKey());
-					else
+			case "login":
+				action.setCreationTimestamp(now);
+				try {
+					Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
+					if (element.isPresent()) {
+						element.get().getActiveUsers().add(new ActiveUser(user.get().getEmail(), false, -1, 0));
 						this.elementDao.update(element.get());
-					this.userDao.update(user.get());
-					this.actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.getSequenceName()));
-					return convertToMap(element.get());
-				} else
-					throw new RuntimeException("the element isn't exist");
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
+						actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.SEQUENCE_NAME));
+						return convertToMap(element.get());
+					}
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
 
-		case "edit-code":
-			action.setCreationTimestamp(now);
-			try {
-				Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
-				if (element.isPresent()) {
-					List<Line> linesOfCode = element.get().getLinesOfCode();
-					element.get().setLastEditTimestamp(now); // edited now
-					String event = (String) action.getProperties().get("event");
-					int start = 0;
-					int beforeLength = 0;
-					boolean locked = false;
-					for(ActiveUser au : element.get().getActiveUsers()) 
-						if(au.getEmail().equals(user.get().getEmail())) {
-							start = au.getStart();
-							beforeLength = au.getBeforeEditLength();
-						}
-					if(event.equals("BACK_SPACE")) {
-						if(element.get().getLinesOfCode().get(start-1).isLocked())
-							locked = true;
-						else {
-							start--;
-							beforeLength++;
-						}
+			case "logout":
+				action.setCreationTimestamp(now);
+				try {
+					Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
+					if (element.isPresent()) {
+						element.get().getActiveUsers().removeIf(au -> au.getEmail().equals(user.get().getEmail()));
+						this.elementDao.update(element.get());
+						actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.SEQUENCE_NAME));
+						return convertToMap(element.get());
 					}
-					if(event.equals("DELETE")) {
-						if(element.get().getLinesOfCode().get(start+1).isLocked())
-							locked = true;
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+
+			case "delete":
+				action.setCreationTimestamp(now);
+				try {
+					Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
+					if (element.isPresent()) {
+						element.get().getUsers().remove(user.get().getEmail());
+						element.get().getActiveUsers().removeIf(au -> au.getEmail().equals(user.get().getEmail()));
+						user.get().getProjects().remove(element.get().getKey());
+						if (element.get().getUsers().isEmpty())
+							this.elementDao.deleteByKey(element.get().getKey());
 						else
-							beforeLength++;
-					}
-					System.out.println("start = " + start);
-					System.out.println("beforeLength = " + beforeLength);
-					
-					String text = (String) action.getProperties().get("code");
-					String [] stringArr = {""};
-					int length = 0;
-					if(text != null && !text.equals("")) {
-						stringArr = text.split("\n");
-						length = stringArr.length;
-						System.out.println("length = " + length);
-					}
-					
-							
-					/*
-					 * remove the out dated lines
-					 */
-					for(int i = 0 ; i < beforeLength; i++) {
-						System.out.println("*** " + linesOfCode.get(start));
-						linesOfCode.remove(start);
-					}
-					
-					/*
-					 * add all new lines (and the locked lines) to the list
-					 */
-					for(int i=start, j=0 ; i < length+start ; i++,j++) {
-						Line tempLine = new Line(i,stringArr[j]);
-						linesOfCode.add(i, tempLine);
-					}
-					
-					element.get().setLinesOfCode(linesOfCode);
-					element.get().setNumberOfLines(linesOfCode.size());
-					for(ActiveUser activeUser: element.get().getActiveUsers()) {
-						if(!activeUser.getEmail().equals(user.get().getEmail()) 
-								&& activeUser.isEditing())
-							activeUser.setStart(activeUser.getStart()+length-(beforeLength));
-					}
-					this.elementDao.updateLinesOfCode(element.get());
-					this.actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.getSequenceName()));
-					
-					Map<String, Object> result = convertToMap(element.get());
-					if(locked) {
-						result.put("error", "The line that you're trying to reach is locked by another user.");
-					}
-					else
-						result.put("error", "");
-					
-					return result;
+							this.elementDao.update(element.get());
+						this.userDao.update(user.get());
+						this.actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.getSequenceName()));
+						return convertToMap(element.get());
+					} else
+						throw new RuntimeException("the element isn't exist");
+				} catch (Exception e) {
+					throw new RuntimeException(e);
 				}
-				throw new RuntimeException("the element doesn't exist");
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		case "connect":
-			try {
-				return null;
-			}
-			catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-			
-		case "logs":
-			try {
-				Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
-				if (element.isPresent()) {
-					List<ActionEntity> actions = this.actionDao.readActionsWithElementKey(action.getElementKey(), 10, 0);
-					Map<String, Object> result = new HashMap<>();
-					for(ActionEntity ae: actions)
-						result.put(ae.getActionId(), ae);
-					return result;
+
+			case "edit-code":
+				action.setCreationTimestamp(now);
+				try {
+					Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
+					if (element.isPresent()) {
+						List<Line> linesOfCode = element.get().getLinesOfCode();
+						element.get().setLastEditTimestamp(now); // edited now
+						String event = (String) action.getProperties().get("event");
+						int start = 0;
+						int beforeLength = 0;
+						boolean locked = false;
+						for (ActiveUser au : element.get().getActiveUsers())
+							if (au.getEmail().equals(user.get().getEmail())) {
+								start = au.getStart();
+								beforeLength = au.getBeforeEditLength();
+							}
+						if (event.equals("BACK_SPACE")) {
+							if (element.get().getLinesOfCode().get(start - 1).isLocked())
+								locked = true;
+							else {
+								start--;
+								beforeLength++;
+							}
+						}
+						if (event.equals("DELETE")) {
+							if (element.get().getLinesOfCode().get(start + 1).isLocked())
+								locked = true;
+							else
+								beforeLength++;
+						}
+						if (event.equals("UP"))
+							if (element.get().getLinesOfCode().get(start - 1).isLocked())
+								locked = true;
+
+						if (event.equals("DOWN"))
+							if (element.get().getLinesOfCode().get(start + 1).isLocked())
+								locked = true;
+
+						System.out.println("start = " + start);
+						System.out.println("beforeLength = " + beforeLength);
+
+						String text = (String) action.getProperties().get("code");
+						String[] stringArr = { "" };
+						int length = 0;
+						if (text != null && !text.equals("")) {
+							stringArr = text.split("\n");
+							length = stringArr.length;
+							System.out.println("length = " + length);
+						}
+
+						/*
+						 * remove the out dated lines
+						 */
+						for (int i = 0; i < beforeLength; i++) {
+							System.out.println("*** " + linesOfCode.get(start));
+							linesOfCode.remove(start);
+						}
+
+						/*
+						 * add all new lines (and the locked lines) to the list
+						 */
+						for (int i = start, j = 0; i < length + start; i++, j++) {
+							Line tempLine = new Line(i, stringArr[j]);
+							linesOfCode.add(i, tempLine);
+						}
+
+						element.get().setLinesOfCode(linesOfCode);
+						element.get().setNumberOfLines(linesOfCode.size());
+						for (ActiveUser activeUser : element.get().getActiveUsers()) {
+							if (!activeUser.getEmail().equals(user.get().getEmail()) && activeUser.isEditing())
+								activeUser.setStart(activeUser.getStart() + length - (beforeLength));
+						}
+
+						linesOfCode.get(start).setLocked(true);
+
+						this.elementDao.updateLinesOfCode(element.get());
+						this.actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.getSequenceName()));
+
+						Map<String, Object> result = convertToMap(element.get());
+						if (locked) {
+							result.put("error", "The line that you're trying to reach is locked by another user.");
+						} else
+							result.put("error", "");
+
+						return result;
+					}
+					throw new RuntimeException("the element doesn't exist");
+				} catch (Exception e) {
+					throw new RuntimeException(e);
 				}
+
+			case "logs":
+				try {
+					Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
+					if (element.isPresent()) {
+						List<ActionEntity> actions = this.actionDao.readActionsWithElementKey(action.getElementKey(),
+								10, 0);
+						Map<String, Object> result = new HashMap<>();
+						for (ActionEntity ae : actions)
+							result.put(ae.getActionId(), ae);
+						return result;
+					}
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+
+			default:
+				throw new RuntimeException("Action type does not exist!");
 			}
-			catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-			
-		default:
-			throw new RuntimeException("Action type does not exist!");
 		}
 	}
 
