@@ -50,13 +50,9 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 	@Override
 	@Transactional
 	public Map<String, Object> invokeAction(String email, ActionEntity action) {
-		Date now = new Date();
-		now.setHours((new Date()).getHours() + 3);
 		String type = action.getActionType();
-		if (type.equals("connect")) {
-			action.setCreationTimestamp(now);
+		if (type.equals("connect"))
 			return null;
-		}
 		else {
 			Optional<UserEntity> user = this.userDao.readById(email);
 			if (user.isPresent()) {
@@ -64,6 +60,8 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 			} else
 				throw new RuntimeException("The user doesn't exist");
 
+			Date now = new Date();
+			now.setHours((new Date()).getHours() + 3);
 			switch (type) {
 			case "lock":
 				action.setCreationTimestamp(now);
@@ -75,7 +73,7 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 						int start = (int) action.getProperties().get("start");
 						int count = (int) action.getProperties().get("count");
 						for (ActiveUser au : element.get().getActiveUsers()) // change the start
-							if (au.getEmail().equals(user.get().getEmail())) { // TODO RETURN FALSE IF ALREADY LOCKED
+							if (au.getEmail().equals(user.get().getEmail())) {
 								au.setEditing(true);
 								au.setStart(start);
 								au.setBeforeEditLength(count);
@@ -161,7 +159,7 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 				try {
 					Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
 					if (element.isPresent()) {
-						element.get().getActiveUsers().add(new ActiveUser(user.get().getEmail(), false, -1, 0));
+						element.get().getActiveUsers().add(new ActiveUser(user.get().getEmail(), false, -1, 1));
 						this.elementDao.update(element.get());
 						actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.SEQUENCE_NAME));
 						return convertToMap(element.get());
@@ -205,46 +203,20 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 					throw new RuntimeException(e);
 				}
 
-			case "edit-code":
+			case "edit-code-save":
 				action.setCreationTimestamp(now);
 				try {
 					Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
 					if (element.isPresent()) {
 						List<Line> linesOfCode = element.get().getLinesOfCode();
 						element.get().setLastEditTimestamp(now); // edited now
-						String event = (String) action.getProperties().get("event");
 						int start = 0;
 						int beforeLength = 0;
-						boolean locked = false;
 						for (ActiveUser au : element.get().getActiveUsers())
 							if (au.getEmail().equals(user.get().getEmail())) {
 								start = au.getStart();
 								beforeLength = au.getBeforeEditLength();
 							}
-						if (event.equals("BACK_SPACE")) {
-							if (element.get().getLinesOfCode().get(start - 1).isLocked())
-								locked = true;
-							else {
-								start--;
-								beforeLength++;
-							}
-						}
-						if (event.equals("DELETE")) {
-							if (element.get().getLinesOfCode().get(start + 1).isLocked())
-								locked = true;
-							else
-								beforeLength++;
-						}
-						if (event.equals("UP"))
-							if (element.get().getLinesOfCode().get(start - 1).isLocked())
-								locked = true;
-
-						if (event.equals("DOWN"))
-							if (element.get().getLinesOfCode().get(start + 1).isLocked())
-								locked = true;
-
-						System.out.println("start = " + start);
-						System.out.println("beforeLength = " + beforeLength);
 
 						String text = (String) action.getProperties().get("code");
 						String[] stringArr = { "" };
@@ -277,8 +249,127 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 							if (!activeUser.getEmail().equals(user.get().getEmail()) && activeUser.isEditing())
 								activeUser.setStart(activeUser.getStart() + length - (beforeLength));
 						}
+						this.elementDao.updateLinesOfCode(element.get());
+						this.actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.getSequenceName()));
+						return convertToMap(element.get());
+					}
+					throw new RuntimeException("the element doesn't exist");
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
 
-						linesOfCode.get(start).setLocked(true);
+			case "edit-code-event":
+				action.setCreationTimestamp(now);
+				try {
+					Optional<ElementEntity> element = this.elementDao.readById(action.getElementKey());
+					if (element.isPresent()) {
+						List<Line> linesOfCode = element.get().getLinesOfCode();
+						element.get().setLastEditTimestamp(now); // edited now
+						String event = (String) action.getProperties().get("event");
+						int start = 0;
+						int beforeLength = 0;
+						boolean locked = false;
+						for (ActiveUser au : element.get().getActiveUsers())
+							if (au.getEmail().equals(user.get().getEmail())) {
+								start = au.getStart();
+								beforeLength = au.getBeforeEditLength();
+							}
+						int destination = start;
+						int originalStart = start;
+						switch (event) {
+						case "BACK_SPACE":
+							if (element.get().getLinesOfCode().get(start - 1).isLocked())
+								locked = true;
+							else {
+								start--; // go to the line above
+								beforeLength++;
+							}
+							destination = start; // if line above locked, stay in the same line. if not, go to line
+													// above
+							break;
+
+						case "DELETE":
+							if (element.get().getLinesOfCode().get(start + 1).isLocked())
+								locked = true;
+							else
+								beforeLength++;
+							destination = start; // stay in the same line
+							break;
+
+						case "UP":
+							if (element.get().getLinesOfCode().get(start - 1).isLocked())
+								locked = true;
+							else
+								destination = start - 1; // if line above locked, stay in the same line. if not, go to
+															// line above
+							break;
+
+						case "DOWN":
+							if (element.get().getLinesOfCode().get(start + 1).isLocked())
+								locked = true;
+							else
+								destination = start + 1; // if line below locked, stay in the same line. if not, go to
+															// line below
+							break;
+
+						case "ENTER":
+							destination = start + 1; // TODO MICHAEL PLEASE CHECK THIS
+							break;
+
+						}
+
+						System.out.println("start = " + start);
+						System.out.println("beforeLength = " + beforeLength);
+
+						String text = (String) action.getProperties().get("code");
+						String[] stringArr = { "" };
+						int length = 0;
+						if (text != null && !text.equals("")) {
+							stringArr = text.split("\n");
+							length = stringArr.length;
+							System.out.println("length = " + length);
+						}
+
+						/*
+						 * remove the out dated lines
+						 */
+						for (int i = 0; i < beforeLength; i++) {
+							System.out.println("*** " + linesOfCode.get(start));
+							linesOfCode.remove(start);
+						}
+
+						/*
+						 * add all new lines (and the locked lines) to the list
+						 */
+						for (int i = start, j = 0; i < length + start; i++, j++) {
+							Line tempLine = new Line(i, stringArr[j]);
+							linesOfCode.add(i, tempLine);
+						}
+
+						if (!locked) // if he did move the cursor
+							linesOfCode.get(originalStart).setLocked(false); // Unlock previous locked lines by me
+						linesOfCode.get(destination).setLocked(true); // No matter where the destination is, lock it,
+																		// even if the line is occupied (it's already
+																		// locked by another user so it doesn't matter)
+
+						element.get().setLinesOfCode(linesOfCode);
+						element.get().setNumberOfLines(linesOfCode.size());
+						for (ActiveUser activeUser : element.get().getActiveUsers()) {
+							if (!activeUser.getEmail().equals(user.get().getEmail())) {
+								if (activeUser.isEditing())
+									activeUser.setStart(activeUser.getStart() + length - (beforeLength));
+							} else { // THE EDITING USER
+								if (!locked) {
+									activeUser.setEditing(true);
+									activeUser.setStart(start);
+									activeUser.setBeforeEditLength(beforeLength);
+								} else { // pop up message of locked line and return the cursor to the original position
+									activeUser.setEditing(true);
+									activeUser.setStart(originalStart);
+									activeUser.setBeforeEditLength(1);
+								}
+							}
+						}
 
 						this.elementDao.updateLinesOfCode(element.get());
 						this.actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.getSequenceName()));
