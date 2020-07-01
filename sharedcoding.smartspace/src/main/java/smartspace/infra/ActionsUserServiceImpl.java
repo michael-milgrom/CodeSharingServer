@@ -1,12 +1,10 @@
 package smartspace.infra;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -15,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import smartspace.aop.CheckRoleOfUser;
 import smartspace.dao.EnhancedActionDao;
 import smartspace.dao.EnhancedElementDao;
 import smartspace.dao.EnhancedUserDao;
@@ -24,15 +21,12 @@ import smartspace.data.ActionEntity;
 import smartspace.data.ElementEntity;
 import smartspace.data.Line;
 import smartspace.data.UserEntity;
-import smartspace.layout.ActionBoundary;
-import smartspace.data.ActionType;
 import smartspace.data.ActiveUser;
 
 @Service
 public class ActionsUserServiceImpl implements ActionsUserService {
 
 	private EnhancedActionDao actionDao;
-	ObjectMapper jackson;
 	private EnhancedUserDao<String> userDao;
 	private EnhancedElementDao<String> elementDao;
 	private SequenceDao sequenceDao;

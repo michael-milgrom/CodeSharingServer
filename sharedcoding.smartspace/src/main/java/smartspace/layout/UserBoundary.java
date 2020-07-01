@@ -5,7 +5,6 @@ import smartspace.data.UserEntity;
 import java.util.ArrayList;
 import java.util.List;
 
-import smartspace.data.ActionType;
 
 public class UserBoundary {
 	private String email;

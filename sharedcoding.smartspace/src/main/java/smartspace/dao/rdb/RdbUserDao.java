@@ -19,7 +19,7 @@ public class RdbUserDao implements EnhancedUserDao<String> {
 	private UserCrud userCrud;
 
 	@Autowired
-	public RdbUserDao(UserCrud userCrud, GenericIdGeneratorCrud genericIdGeneratorCrud) {
+	public RdbUserDao(UserCrud userCrud) {
 		super();
 		this.userCrud = userCrud;
 	}
@@ -113,15 +113,6 @@ public class RdbUserDao implements EnhancedUserDao<String> {
 	@Transactional
 	public UserEntity createfromImport(UserEntity entity) {
 		return this.userCrud.save(entity);
-	}
-	
-	@Override
-	@Transactional(readOnly=true)
-	public List<UserEntity> readMessageWithEmailContaining(String email, int size, int page) {
-		return this.userCrud
-				.findAllByEmailLike(
-						"%" + email + "%",
-						PageRequest.of(page, size));
 	}
 	
 }

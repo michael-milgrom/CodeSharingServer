@@ -8,7 +8,6 @@ import smartspace.data.ActionEntity;
 import smartspace.data.ElementEntity;
 import smartspace.data.Line;
 import smartspace.data.UserEntity;
-import smartspace.data.ActionType;
 import smartspace.data.ActiveUser;
 
 public interface EntityFactory {

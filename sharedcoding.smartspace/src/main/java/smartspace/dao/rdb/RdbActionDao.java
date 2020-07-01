@@ -75,15 +75,9 @@ public class RdbActionDao implements EnhancedActionDao {
 	}
 
 	@Override
-	@Transactional
-	public ActionEntity createImportAction(ActionEntity entity) {
-		return this.actionCrud.save(entity);
-	}
-
-	@Override
 	@Transactional(readOnly = true)
 	public List<ActionEntity> readActionsWithElementKey(String elementKey, int size, int page) {
-		return this.actionCrud.findAllByElementKeyLike("%" + elementKey + "%", PageRequest.of(page, size));
+		return this.actionCrud.findAllByElementKey(elementKey, PageRequest.of(page, size));
 	}
 
 	@Override

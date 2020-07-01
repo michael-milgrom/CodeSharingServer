@@ -22,19 +22,16 @@ public class ElementsUserServiceImpl implements ElementsUserService {
 
 	private EnhancedElementDao<String> elementDao;
 	private EnhancedUserDao<String> userDao;
-	private SequenceDao sequenceDao;
 
 	@Autowired
-	public ElementsUserServiceImpl(EnhancedElementDao<String> elementDao, EnhancedUserDao<String> userDao, SequenceDao sequenceDao) {
+	public ElementsUserServiceImpl(EnhancedElementDao<String> elementDao, EnhancedUserDao<String> userDao) {
 		super();
 		this.elementDao = elementDao;
 		this.userDao = userDao;
-		this.sequenceDao = sequenceDao;
 	}
 
 	@Override
 	@Transactional
-	//@CheckRoleOfUser
 	public ElementEntity newElement(ElementEntity element, String creator) {
 		if (valiadate(element)) {
 	
@@ -57,7 +54,6 @@ public class ElementsUserServiceImpl implements ElementsUserService {
 
 	@Override
 	@Transactional
-	//@CheckRoleOfUser
 	public void setElement(String email, String elementId,ElementEntity element) {
 		if(!element.getUsers().contains(email))
 			throw new RuntimeException("The user doesn't has access to this project");
@@ -67,7 +63,6 @@ public class ElementsUserServiceImpl implements ElementsUserService {
 	
 	@Override
 	@Transactional
-	//@CheckRoleOfUser
 	public void setElementCode(String email, String elementId,ElementEntity element) {
 		if(!element.getUsers().contains(email))
 			throw new RuntimeException("The user doesn't has access to this project");
@@ -78,7 +73,6 @@ public class ElementsUserServiceImpl implements ElementsUserService {
 	}
 
 	@Override
-	//@CheckRoleOfUser
 	public ElementEntity getSpecificElement(String email, String elementKey) {
 		ElementEntity element = this.elementDao.readById(elementKey)
 				.orElseThrow(() -> new RuntimeException("There is no element with the given key"));
@@ -89,7 +83,6 @@ public class ElementsUserServiceImpl implements ElementsUserService {
 	}
 
 	@Override
-	//@CheckRoleOfUser
 	public List<ElementEntity> getElementsUsingPagination(String userEmail, int size, int page) { 
 		UserEntity user = this.userDao.readById(userEmail)
 				.orElseThrow(() -> new RuntimeException("There is no user with the given key"));
@@ -102,31 +95,14 @@ public class ElementsUserServiceImpl implements ElementsUserService {
 				elements_entities.add(this.elementDao.readById(elementKey).get());
 		}
 		return elements_entities;
-		//return this.elementDao.readAll(size, page);
 	}
 
 	@Override
-	//@CheckRoleOfUser
 	public Collection<ElementEntity> getElementsUsingPaginationOfName(String name, int size, int page) {
 		
 		return this.elementDao.readAllUsingName(name, size, page);
 		
 	}
-
-//	@Override
-//	//@CheckRoleOfUser
-//	public List<ElementEntity> getElementsUsingPaginationOfSpecifiedType(String userSmartspace, String userEmail, ActionType role,
-//			String type, int size, int page) {
-//
-//		if (role == ActionType.MANAGER) {
-//			return this.elementDao.readAllUsingType(type, size, page);
-//		} else if (role == ActionType.PLAYER) {
-//			return this.elementDao.readAllUsingTypeNotExpired(type, size, page);
-//		} else {
-//			throw new RuntimeException(
-//					"The URl isn't match for manager or player. use another user or URL that match admin user");
-//		}
-//	}
 
 	private boolean valiadate(ElementEntity entity) {
 		return entity != null 
@@ -134,10 +110,8 @@ public class ElementsUserServiceImpl implements ElementsUserService {
 				&& entity.getCreator() != null && !entity.getCreator().trim().isEmpty() 
 				&& entity.getNumberOfLines() >=0 
 				&& entity.getUsers() != null 
-				//&& entity.getElementId() != null && !entity.getElementId().trim().isEmpty()
 				&& entity.getActiveUsers() != null
 				&& entity.getLinesOfCode() != null;
-				//&& entity.getLastEditTimestamp() != null;
 	}
 
 }

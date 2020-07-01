@@ -11,9 +11,9 @@ import smartspace.data.ElementEntity;
 import org.springframework.data.domain.Pageable;
 
 public interface ElementCrud extends PagingAndSortingRepository<ElementEntity, String> {
-	public List<ElementEntity> findAllByCreatorLike(
-			@Param("pattern") String pattern,
-			Pageable pageable);
+//	public List<ElementEntity> findAllByCreatorLike(
+//			@Param("pattern") String pattern,
+//			Pageable pageable);
 	
 	public List<ElementEntity> findAllByName(
 			@Param("name") String name,

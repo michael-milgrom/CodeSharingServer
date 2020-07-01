@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.Map;
 
 import smartspace.data.ActionEntity;
-import smartspace.data.ActionType;
 
 public class ActionBoundary {
 	private Key actionKey;

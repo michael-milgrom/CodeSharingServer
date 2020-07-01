@@ -3,7 +3,6 @@ package smartspace.infra;
 import java.util.Map;
 
 import smartspace.data.ActionEntity;
-import smartspace.data.ActionType;
 
 public interface ActionsUserService {
 	

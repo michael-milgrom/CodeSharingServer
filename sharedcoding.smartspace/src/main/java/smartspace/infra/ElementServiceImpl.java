@@ -2,7 +2,6 @@ package smartspace.infra;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -14,22 +13,16 @@ import smartspace.dao.EnhancedElementDao;
 import smartspace.dao.EnhancedUserDao;
 import smartspace.dao.SequenceDao;
 import smartspace.data.ElementEntity;
-import smartspace.data.UserEntity;
-import smartspace.data.ActionType;
 
 @Service
 public class ElementServiceImpl implements ElementsService {
 	private EnhancedElementDao<String> elementDao;
-	private EnhancedUserDao<String> userDao;
 	private String smartspace;
-	private SequenceDao sequenceDao;
 
 	@Autowired
-	public ElementServiceImpl(EnhancedElementDao<String> elementDao, EnhancedUserDao<String> userDao, SequenceDao sequenceDao) {
+	public ElementServiceImpl(EnhancedElementDao<String> elementDao) {
 		super();
 		this.elementDao = elementDao;
-		this.userDao = userDao;
-		this.sequenceDao = sequenceDao;
 	}
 
 	@Value("${smartspace.name}")
@@ -44,12 +37,8 @@ public class ElementServiceImpl implements ElementsService {
 		
 		for (ElementEntity element : elements) {
 			if (valiadate(element)) {
-//				if (!(this.smartspace.equals(element.getElementSmartspace()))) {
-
 					this.elementDao.createWithId(element);
 					elements_entities.add(element);
-//				} else
-//					throw new RuntimeException("element smartspace must be different then the local project");
 			} else {
 				throw new RuntimeException("invalid element");
 			}

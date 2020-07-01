@@ -12,8 +12,8 @@ import smartspace.data.ActionEntity;
 import org.springframework.data.domain.Pageable;
 
 public interface ActionCrud extends PagingAndSortingRepository<ActionEntity, String>  {
-	public List<ActionEntity> findAllByElementKeyLike(
-			@Param("pattern") String pattern,
+	public List<ActionEntity> findAllByElementKey(
+			@Param("elementKey") String elementKey,
 			Pageable pageable);
 	
 }

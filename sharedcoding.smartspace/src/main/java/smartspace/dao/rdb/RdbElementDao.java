@@ -16,14 +16,12 @@ import smartspace.data.ElementEntity;
 @Repository
 public class RdbElementDao implements EnhancedElementDao<String> {
 
-	private GenericIdGeneratorCrud genericIdGeneratorCrud;
 	private ElementCrud elementCrud;
 
 	@Autowired
-	public RdbElementDao(ElementCrud elementCrud, GenericIdGeneratorCrud genericIdGeneratorCrud) {
+	public RdbElementDao(ElementCrud elementCrud) {
 		super();
 		this.elementCrud = elementCrud;
-		this.genericIdGeneratorCrud = genericIdGeneratorCrud;
 	}
 
 	@Override
@@ -124,18 +122,6 @@ public class RdbElementDao implements EnhancedElementDao<String> {
 	@Transactional(readOnly = true)
 	public List<ElementEntity> readAll(String sortBy, int size, int page) {
 		return this.elementCrud.findAll(PageRequest.of(page, size, Direction.ASC, sortBy)).getContent();
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public List<ElementEntity> readMessageWithCreatorContaining(String creator, int size, int page) {
-		return this.elementCrud.findAllByCreatorLike("%" + creator + "%", PageRequest.of(page, size));
-	}
-
-	@Override
-	@Transactional
-	public ElementEntity createImportAction(ElementEntity entity) {
-		return this.elementCrud.save(entity);
 	}
 
 	@Override

@@ -2,7 +2,6 @@ package smartspace.infra;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import smartspace.dao.EnhancedUserDao;
 import smartspace.data.UserEntity;
-import smartspace.data.ActionType;
 
 @Service
 public class UsersServiceImpl implements UsersService {

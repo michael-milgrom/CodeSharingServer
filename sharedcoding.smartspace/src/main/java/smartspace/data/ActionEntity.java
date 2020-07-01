@@ -37,7 +37,6 @@ public class ActionEntity implements SmartspaceEntity<String> {
 	public ActionEntity(String type) {
 		this();
 		this.actionType = type;
-		//this.properties = new HashMap<>();
 	}
 	
 	public ActionEntity(String actionId, String elementKey, String user, String actionType, Date creationTimestamp,
