@@ -313,7 +313,7 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 						}
 
 						System.out.println("start = " + start);
-						System.out.println("beforeLength = " + beforeLength);
+						System.out.println("destination = " + destination);
 
 						String text = (String) action.getProperties().get("code");
 						String[] stringArr = { "" };
@@ -351,11 +351,12 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 						for (ActiveUser activeUser : element.get().getActiveUsers()) {
 							if (!activeUser.getEmail().equals(user.get().getEmail())) {
 								if (activeUser.isEditing())
-									activeUser.setStart(activeUser.getStart() + length - (beforeLength));
+									if(activeUser.getStart() >= originalStart)
+										activeUser.setStart(activeUser.getStart() + length - (beforeLength));
 							} else { // THE EDITING USER
 								if (!locked) {
 									activeUser.setEditing(true);
-									activeUser.setStart(start);
+									activeUser.setStart(destination);
 									activeUser.setBeforeEditLength(beforeLength);
 								} else { // pop up message of locked line and return the cursor to the original position
 									activeUser.setEditing(true);
