@@ -262,6 +262,7 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 						List<Line> linesOfCode = element.get().getLinesOfCode();
 						element.get().setLastEditTimestamp(now); // edited now
 						String event = (String) action.getProperties().get("event");
+						String before = (String) action.getProperties().get("before-change");
 						int start = 0;
 						int beforeLength = 1;
 						boolean locked = false;
@@ -340,7 +341,11 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 						 * add all new lines (and the locked lines) to the list
 						 */
 						for (int i = start, j = 0; i < length + start; i++, j++) {
-							Line tempLine = new Line(i, stringArr[j]);
+							Line tempLine;
+							if(locked)
+								tempLine = new Line(i, before);
+							else
+								tempLine = new Line(i, stringArr[j]);
 							linesOfCode.add(i, tempLine);
 						}
 
