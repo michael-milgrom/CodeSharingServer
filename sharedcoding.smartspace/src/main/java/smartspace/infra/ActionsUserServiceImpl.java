@@ -205,11 +205,11 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 						List<Line> linesOfCode = element.get().getLinesOfCode();
 						element.get().setLastEditTimestamp(now); // edited now
 						int start = 0;
-						int beforeLength = 0;
+						int beforeLength = 1;
 						for (ActiveUser au : element.get().getActiveUsers())
 							if (au.getEmail().equals(user.get().getEmail())) {
 								start = au.getStart();
-								beforeLength = au.getBeforeEditLength();
+								//beforeLength = au.getBeforeEditLength();
 							}
 
 						String text = (String) action.getProperties().get("code");
@@ -236,6 +236,8 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 							Line tempLine = new Line(i, stringArr[j]);
 							linesOfCode.add(i, tempLine);
 						}
+						
+						linesOfCode.get(start+beforeLength-1).setLocked(true);;
 
 						element.get().setLinesOfCode(linesOfCode);
 						element.get().setNumberOfLines(linesOfCode.size());
@@ -261,12 +263,12 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 						element.get().setLastEditTimestamp(now); // edited now
 						String event = (String) action.getProperties().get("event");
 						int start = 0;
-						int beforeLength = 0;
+						int beforeLength = 1;
 						boolean locked = false;
 						for (ActiveUser au : element.get().getActiveUsers())
 							if (au.getEmail().equals(user.get().getEmail())) {
 								start = au.getStart();
-								beforeLength = au.getBeforeEditLength();
+								//beforeLength = au.getBeforeEditLength();
 							}
 						int destination = start;
 						int originalStart = start;
@@ -290,6 +292,7 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 							destination = start; // stay in the same line
 							break;
 
+						case "LEFT":
 						case "UP":
 							if (element.get().getLinesOfCode().get(start - 1).isLocked())
 								locked = true;
@@ -298,6 +301,7 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 															// line above
 							break;
 
+						case "RIGHT":
 						case "DOWN":
 							if (element.get().getLinesOfCode().get(start + 1).isLocked())
 								locked = true;
@@ -307,7 +311,7 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 							break;
 
 						case "ENTER":
-							destination = start + 1; // TODO MICHAEL PLEASE CHECK THIS
+							destination = start + 1; 
 							break;
 
 						}
