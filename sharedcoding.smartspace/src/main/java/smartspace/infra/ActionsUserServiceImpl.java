@@ -50,7 +50,6 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 		else {
 			Optional<UserEntity> user = this.userDao.readById(email);
 			if (user.isPresent()) {
-				// TODO MAYBE SHOW THAT HE IS EDITING OR SOMETHING
 			} else
 				throw new RuntimeException("The user doesn't exist");
 
