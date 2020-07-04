@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import smartspace.dao.EnhancedElementDao;
 import smartspace.dao.EnhancedUserDao;
-import smartspace.dao.SequenceDao;
 import smartspace.data.ElementEntity;
 import smartspace.data.UserEntity;
 

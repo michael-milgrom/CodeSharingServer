@@ -14,7 +14,6 @@ import org.springframework.data.domain.Pageable;
 public interface ActionCrud extends PagingAndSortingRepository<ActionEntity, String>  {
 	public List<ActionEntity> findAllByElementKey(
 			@Param("elementKey") String elementKey,
-			Pageable pageable);
-	
+			Pageable pageable);	
 }
 

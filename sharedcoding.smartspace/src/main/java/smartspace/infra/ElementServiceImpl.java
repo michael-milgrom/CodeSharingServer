@@ -62,6 +62,6 @@ public class ElementServiceImpl implements ElementsService {
 
 	@Override
 	public List<ElementEntity> getElementsUsingPagination(int size, int page) {
-		return this.elementDao.readAll("creationTimestamp", size, page);// key?????
+		return this.elementDao.readAll("creationTimestamp", size, page);
 	}
 }

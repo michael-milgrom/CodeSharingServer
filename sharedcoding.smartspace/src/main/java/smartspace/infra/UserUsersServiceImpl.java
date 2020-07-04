@@ -42,11 +42,7 @@ public class UserUsersServiceImpl implements UserUsersService{
 		else
 			throw new RuntimeException("password does not match");
 	}
-//	@Override
-//	public UserEntity getUser(String email) {
-//		return this.userDao.readById(email).get();
-//		
-//	}
+
 
 	@Override
 	@Transactional

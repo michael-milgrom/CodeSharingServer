@@ -35,7 +35,6 @@ public class UserEntity implements SmartspaceEntity<String> {
 	
 	public UserEntity(String email) {
 		this.email = email;
-		//projects = new ArrayList<String>();
 	}
 
 

@@ -209,47 +209,50 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 						for (ActiveUser au : element.get().getActiveUsers())
 							if (au.getEmail().equals(user.get().getEmail())) {
 								start = au.getStart();
-								//beforeLength = au.getBeforeEditLength();
+								// beforeLength = au.getBeforeEditLength();
 							}
 
-						String text = (String) action.getProperties().get("code");
-						String[] stringArr = { "" };
-						int length = 0;
-						if (text != null && !text.equals("")) {
-							stringArr = text.split("\n");
-							length = stringArr.length;
-							System.out.println("length = " + length);
-						}
+						if (start != -1) {
+							String text = (String) action.getProperties().get("code");
+							String[] stringArr = { "" };
+							int length = 0;
+							if (text != null && !text.equals("")) {
+								stringArr = text.split("\n");
+								length = stringArr.length;
+								System.out.println("length = " + length);
+							}
 
-						/*
-						 * remove the out dated lines
-						 */
-						for (int i = 0; i < beforeLength; i++) {
-							System.out.println("*** " + linesOfCode.get(start));
-							linesOfCode.remove(start);
-						}
+							/*
+							 * remove the out dated lines
+							 */
+							for (int i = 0; i < beforeLength; i++) {
+								System.out.println("*** " + linesOfCode.get(start));
+								linesOfCode.remove(start);
+							}
 
-						/*
-						 * add all new lines (and the locked lines) to the list
-						 */
-						for (int i = start, j = 0; i < length + start; i++, j++) {
-							Line tempLine = new Line(i, stringArr[j]);
-							linesOfCode.add(i, tempLine);
-						}
-						
-						linesOfCode.get(start+beforeLength-1).setLocked(true);;
+							/*
+							 * add all new lines (and the locked lines) to the list
+							 */
+							for (int i = start, j = 0; i < length + start; i++, j++) {
+								Line tempLine = new Line(i, stringArr[j]);
+								linesOfCode.add(i, tempLine);
+							}
 
-						element.get().setLinesOfCode(linesOfCode);
-						element.get().setNumberOfLines(linesOfCode.size());
-						for (ActiveUser activeUser : element.get().getActiveUsers()) {
-							if (!activeUser.getEmail().equals(user.get().getEmail()) && activeUser.isEditing())
-								activeUser.setStart(activeUser.getStart() + length - (beforeLength));
+							linesOfCode.get(start + beforeLength - 1).setLocked(true);
+							
+
+							element.get().setLinesOfCode(linesOfCode);
+							element.get().setNumberOfLines(linesOfCode.size());
+							for (ActiveUser activeUser : element.get().getActiveUsers()) {
+								if (!activeUser.getEmail().equals(user.get().getEmail()) && activeUser.isEditing())
+									activeUser.setStart(activeUser.getStart() + length - (beforeLength));
+							}
+							this.elementDao.updateLinesOfCode(element.get());
+							this.actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.getSequenceName()));
 						}
-						this.elementDao.updateLinesOfCode(element.get());
-						this.actionDao.createWithId(action, sequenceDao.newEntity(ActionEntity.getSequenceName()));
 						return convertToMap(element.get());
-					}
-					throw new RuntimeException("the element doesn't exist");
+					} else
+						throw new RuntimeException("the element doesn't exist");
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
@@ -269,7 +272,7 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 						for (ActiveUser au : element.get().getActiveUsers())
 							if (au.getEmail().equals(user.get().getEmail())) {
 								start = au.getStart();
-								//beforeLength = au.getBeforeEditLength();
+								// beforeLength = au.getBeforeEditLength();
 							}
 						int destination = start;
 						int originalStart = start;
@@ -312,7 +315,7 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 							break;
 
 						case "ENTER":
-							destination = start + 1; 
+							destination = start + 1;
 							break;
 
 						}
@@ -342,7 +345,7 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 						 */
 						for (int i = start, j = 0; i < length + start; i++, j++) {
 							Line tempLine;
-							if(locked)
+							if (locked)
 								tempLine = new Line(i, before);
 							else
 								tempLine = new Line(i, stringArr[j]);
@@ -360,7 +363,7 @@ public class ActionsUserServiceImpl implements ActionsUserService {
 						for (ActiveUser activeUser : element.get().getActiveUsers()) {
 							if (!activeUser.getEmail().equals(user.get().getEmail())) {
 								if (activeUser.isEditing())
-									if(activeUser.getStart() >= originalStart)
+									if (activeUser.getStart() >= originalStart)
 										activeUser.setStart(activeUser.getStart() + length - (beforeLength));
 							} else { // THE EDITING USER
 								if (!locked) {

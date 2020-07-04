@@ -37,7 +37,7 @@ public class ActionBoundary {
 		this.type = entity.getActionType();
 		this.created = entity.getCreationTimestamp();
 			
-		this.element = new Key();//??
+		this.element = new Key();
 		this.element.setId(entity.getActionId());
 		this.element.setUser(entity.getUser());
 		

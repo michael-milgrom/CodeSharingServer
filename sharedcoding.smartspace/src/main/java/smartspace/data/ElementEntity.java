@@ -41,9 +41,6 @@ public class ElementEntity implements SmartspaceEntity<String> {
 	public ElementEntity(String name) {
 		this();
 		this.name = name;	
-		//this.users = new ArrayList<String>();
-		//this.activeUsers = new ArrayList<String>();
-		//this.linesOfCode = new ArrayList<Line>();
 	}
 	
 	public ElementEntity(String name, String creator, int numberOfLines, Date lastEditTimestamp, 
